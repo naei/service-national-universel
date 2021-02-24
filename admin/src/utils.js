@@ -76,6 +76,8 @@ export const translate = (value) => {
       return "Abandonnée";
     case "ARCHIVED":
       return "Archivée";
+    case "DELETED":
+      return "Supprimée";
     case "WITHDRAWN":
       return "Désistée";
     case "DONE":

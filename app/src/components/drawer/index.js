@@ -1,10 +1,14 @@
 import React, { useEffect, useState } from "react";
 import { Link, NavLink } from "react-router-dom";
 import styled from "styled-components";
-import { useSelector } from "react-redux";
+import { useSelector, useDispatch } from "react-redux";
+
+import { setYoung } from "../../redux/auth/actions";
 import { YOUNG_PHASE, YOUNG_STATUS, PHASE_STATUS } from "../../utils";
+import api from "../../services/api";
 import Item from "./item";
 import { DRAWER_TABS } from "../utils";
+import { toastr } from "react-redux-toastr";
 
 export default ({ inscription }) => {
   const [open, setOpen] = useState(true);
@@ -179,8 +183,48 @@ export default ({ inscription }) => {
             Foire aux questions
           </a>
         </li>
+        <li>
+          <DeleteAccountButton />
+        </li>
       </MyNav>
     </Sidebar>
+  );
+};
+
+const DeleteAccountButton = ({}) => {
+  const young = useSelector((state) => state.Auth.young);
+  const mandatoryPhasesDone = young.statusPhase1 === "DONE" && young.statusPhase2 === "VALIDATED";
+  const dispatch = useDispatch();
+
+  const getLabel = () => {
+    return mandatoryPhasesDone ? "Supprimer mon compte" : "Se désister du SNU";
+  };
+
+  const handleDelete = async () => {
+    if (!confirm("Attention, vous êtes sur le point de supprimer votre compte. Vous serez immédiatement déconnecté. Souhaitez-vous réellement supprimer votre compte ?")) return;
+    // todo : anonymiser data
+    const { ok, code } = await api.put("/young", { status: "DELETED" });
+    if (!ok) return toastr.error("Une erreur est survenu lors du traitement de votre demande", translate(code));
+    logout();
+  };
+
+  const handleWithdrawn = async () => {
+    if (!confirm("Attention, vous êtes sur le point de vous désister du SNU. Vous serez immédiatement déconnecté. Souhaitez-vous réellement vous désister ?")) return;
+    const { ok, code } = await api.put("/young", { status: "WITHDRAWN" });
+    if (!ok) return toastr.error("Une erreur est survenu lors du traitement de votre demande", translate(code));
+    // todo : send notif to young and referent
+    logout();
+  };
+
+  async function logout() {
+    await api.post(`/young/logout`);
+    dispatch(setYoung(null));
+  }
+
+  return (
+    <div className="btn" onClick={mandatoryPhasesDone ? handleDelete : handleWithdrawn}>
+      {getLabel()}
+    </div>
   );
 };
 
@@ -202,6 +246,7 @@ const Sidebar = styled.div`
   overflow-y: auto;
   transition: 0.2s;
   transform: ${({ open }) => (open ? "translateX(0)" : "translateX(-85%)")};
+  .btn,
   a {
     font-size: 13px;
     color: #fff;
