@@ -12,20 +12,20 @@ export default () => {
       {showAlert && (
         <Alert>
           <div className="text">
-            <strong>INSCRIPTION EN ATTENTE DE CORRECTION</strong>
+            <strong>INSCRIPTION EN COURS DE VALIDATION</strong>
           </div>
-          <img src={require("../../assets/close.svg")} height={15} onClick={() => setShowAlert(false)} />
+          <img src={require("../../../assets/close.svg")} height={15} onClick={() => setShowAlert(false)} />
         </Alert>
       )}
       <Content showAlert={showAlert}>
         <h1>
           <strong>{young.firstName},</strong> bienvenue dans votre espace personnel.
         </h1>
-        <p>Une action de votre part est nécessaire afin de valider votre inscription au SNU.</p>
         <p>
-          Vous avez reçu des instructions sur votre adresse mail <span style={{ color: "#5145cd" }}>{young.email}</span>.
+          Votre inscription a bien été enregistrée et est <b style={{ color: "#5145cd" }}>en cours de validation</b> par l'administration. Vous serez prochainement informé(e) par
+          e-mail de l'avancement de votre candidature.
         </p>
-        <p>Vous pouvez effectuer les corrections indiquées en cliquant sur ce bouton.</p>
+        <p>Vous pouvez cependant continuer à éditer les informations renseignées lors de votre inscription.</p>
         <Link to="/inscription/coordonnees">
           <BackButton>Editer mes informations d'inscription</BackButton>
         </Link>
@@ -99,9 +99,12 @@ const Hero = styled.div`
   }
   .thumb {
     min-height: 400px;
-    background: url(${require("../../assets/phase3.jpg")}) no-repeat center;
+    background: url(${require("../../../assets/phase3.jpg")}) no-repeat center;
     background-size: cover;
     flex: 1;
+    @media (max-width: 768px) {
+      display: none;
+    }
     -webkit-clip-path: polygon(15% 0, 0 100%, 100% 100%, 100% 0);
     clip-path: polygon(15% 0, 0 100%, 100% 100%, 100% 0);
   }

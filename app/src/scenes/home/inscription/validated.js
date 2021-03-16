@@ -2,8 +2,8 @@ import React, { useState } from "react";
 import { Link } from "react-router-dom";
 import styled from "styled-components";
 import { useSelector } from "react-redux";
-import NextStep from "../phase1/nextStep";
-import { COHESION_STAY_LIMIT_DATE, INTEREST_MISSION_LIMIT_DATE } from "../../utils";
+import NextStep from "../../phase1/nextStep";
+import { COHESION_STAY_LIMIT_DATE, INTEREST_MISSION_LIMIT_DATE } from "../../../utils";
 
 export default () => {
   const young = useSelector((state) => state.Auth.young);
@@ -27,7 +27,7 @@ export default () => {
             <div className="text">
               <strong>INSCRIPTION VALIDÉE</strong>
             </div>
-            <img src={require("../../assets/close.svg")} height={15} onClick={() => setShowAlert(false)} />
+            <img src={require("../../../assets/close.svg")} height={15} onClick={() => setShowAlert(false)} />
           </Alert>
         )}
         <Content showAlert={showAlert}>
@@ -169,7 +169,7 @@ const Hero = styled.div`
   }
   .thumb {
     min-height: 400px;
-    background: url(${require("../../assets/phase3.jpg")}) no-repeat center;
+    background: url(${require("../../../assets/phase3.jpg")}) no-repeat center;
     background-size: cover;
     flex: 1;
     -webkit-clip-path: polygon(15% 0, 0 100%, 100% 100%, 100% 0);

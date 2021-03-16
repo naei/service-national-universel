@@ -1,12 +1,10 @@
 import React from "react";
 import { Link } from "react-router-dom";
 import styled from "styled-components";
-import { useSelector } from "react-redux";
 import NextStep from "../../phase2/nextStep";
 import { INTEREST_MISSION_LIMIT_DATE, PHASE_STATUS_COLOR, translate } from "../../../utils";
 
-export default () => {
-  const young = useSelector((state) => state.Auth.young);
+export default ({ young }) => {
   // See: https://trello.com/c/vOUIhdhu/406-volontaire-formulaire-all%C3%A9g%C3%A9-pour-les-2020
   const isBornBefore20030702 = young.cohort === "2020" && new Date(young.birthdateAt) < new Date("2003-07-02");
   const needsToRegisterToCohesion = !isBornBefore20030702;
@@ -26,32 +24,37 @@ export default () => {
               1. Un séjour de cohésion <Tag color={PHASE_STATUS_COLOR[young.statusPhase1]}>{translate(young.statusPhase1)}</Tag>
             </div>
             <div className="info">
-              <div className="subtitle">Séjour annulé suite à la crise sanitaire.</div>
-              {isBornBefore20030702 ? (
-                <div className="subtitle more-info">
-                  Malheureusement, vous aurez 18 ans révolus au moment du séjour de cohésion, vous ne pouvez vous y inscrire. Si vous n'avez pas réalisé votre JDC, nous vous
-                  invitons à vous inscrire sur{" "}
-                  <a href="http://majdc.fr" target="_blank">
-                    majdc.fr
-                  </a>{" "}
-                  et à demander à être convoqué pour une session en ligne.
-                </div>
+              {young.cohort === "2020" ? (
+                <>
+                  <div className="subtitle">Séjour annulé suite à la crise sanitaire.</div>
+                  {isBornBefore20030702 ? (
+                    <div className="subtitle more-info">
+                      Malheureusement, vous aurez 18 ans révolus au moment du séjour de cohésion, vous ne pouvez vous y inscrire. Si vous n'avez pas réalisé votre JDC, nous vous
+                      invitons à vous inscrire sur{" "}
+                      <a href="http://majdc.fr" target="_blank">
+                        majdc.fr
+                      </a>{" "}
+                      et à demander à être convoqué pour une session en ligne.
+                    </div>
+                  ) : null}
+                  {needsToRegisterToCohesion ? (
+                    <div className="subtitle more-info">
+                      Vous pouvez cependant demander à participer à la session 2021, sous réserve de votre disponibilité du 21 juin au 2 juillet 2021.
+                      <Link to="/cohesion/consentements">
+                        <Button>Je confirme ma participation au séjour de cohésion</Button>
+                      </Link>
+                      <div style={{ marginTop: "1rem", fontStyle: "italic" }}>
+                        Si vous n'êtes pas disponible sur ces dates et que vous n'avez pas réalisé votre JDC, nous vous invitons à vous inscrire sur{" "}
+                        <a href="http://majdc.fr" target="_blank">
+                          majdc.fr
+                        </a>{" "}
+                        et à demander à être convoqué pour une session en ligne.
+                      </div>
+                    </div>
+                  ) : null}
+                </>
               ) : null}
-              {needsToRegisterToCohesion ? (
-                <div className="subtitle more-info">
-                  Vous pouvez cependant demander à participer à la session 2021, sous réserve de votre disponibilité du 21 juin au 2 juillet 2021.
-                  <Link to="/cohesion/consentements">
-                    <Button>Je confirme ma participation au séjour de cohésion</Button>
-                  </Link>
-                  <div style={{ marginTop: "1rem", fontStyle: "italic" }}>
-                    Si vous n'êtes pas disponible sur ces dates et que vous n'avez pas réalisé votre JDC, nous vous invitons à vous inscrire sur{" "}
-                    <a href="http://majdc.fr" target="_blank">
-                      majdc.fr
-                    </a>{" "}
-                    et à demander à être convoqué pour une session en ligne.
-                  </div>
-                </div>
-              ) : null}
+              {young.cohort === "2019" ? <div className="subtitle">Réalisé {COHESION_STAY_LIMIT_DATE[young.cohort]}.</div> : null}
             </div>
           </WrapperItem>
           <WrapperItem>

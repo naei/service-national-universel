@@ -1,7 +1,7 @@
 import React, { useState } from "react";
 import styled from "styled-components";
 import { useSelector } from "react-redux";
-import ProgramCard from "../phase3/components/programCard";
+import ProgramCard from "../../phase3/components/programCard";
 import { Row, Col } from "reactstrap";
 
 export default () => {
@@ -16,7 +16,7 @@ export default () => {
             <div className="text">
               <strong>CANDIDATURE REFUSÉE</strong>
             </div>
-            <img src={require("../../assets/close.svg")} height={15} onClick={() => setShowAlert(false)} />
+            <img src={require("../../../assets/close.svg")} height={15} onClick={() => setShowAlert(false)} />
           </Alert>
         )}
         <Content showAlert={showAlert}>
@@ -37,7 +37,7 @@ export default () => {
           <Col>
             <ProgramCard
               title="Le Service Civique"
-              image={require("../../assets/engagement-1.jpg")}
+              image={require("../../../assets/engagement-1.jpg")}
               details="Un engagement volontaire au service de l’intérêt général, en France ou à l’étranger, auprès d’organisations à but non lucratif ou publiques."
               href="https://www.service-civique.gouv.fr/"
             />
@@ -45,7 +45,7 @@ export default () => {
           <Col>
             <ProgramCard
               title="Les Sapeurs-Pompiers de France"
-              image={require("../../assets/engagement-2.jpg")}
+              image={require("../../../assets/engagement-2.jpg")}
               details="Si vous souhaitez vous engager pour aider votre prochain tout en ayant une autre activité professionnelle, le statut de sapeur-pompier volontaire peut vous permettre d’y parvenir."
               href="https://www.pompiers.fr/grand-public/devenir-sapeur-pompier"
             />
@@ -55,7 +55,7 @@ export default () => {
           <Col>
             <ProgramCard
               title="Plan Mercredi"
-              image={require("../../assets/engagement-3.png")}
+              image={require("../../../assets/engagement-3.png")}
               details="Le Plan mercredi met en place un cadre de confiance pour les communes et les parents afin d’offrir au plus grand nombre d’enfants un accueil de loisirs éducatifs de grande qualité le mercredi."
               href="http://planmercredi.education.gouv.fr/"
             />
@@ -63,7 +63,7 @@ export default () => {
           <Col>
             <ProgramCard
               title="JeVeuxAider"
-              image={require("../../assets/jva.png")}
+              image={require("../../../assets/jva.png")}
               details="Devenez bénévole et trouvez des missions en quelques clics près de chez vous ou à distance. Plus de 330 000 bénévoles soutiennent des milliers d'associations et d'organisations publiques."
               href="https://jeveuxaider.gouv.fr/"
             />
@@ -123,7 +123,7 @@ const Hero = styled.div`
   }
   .thumb {
     min-height: 400px;
-    background: url(${require("../../assets/phase3.jpg")}) no-repeat center;
+    background: url(${require("../../../assets/phase3.jpg")}) no-repeat center;
     background-size: cover;
     flex: 1;
     @media (max-width: 768px) {
