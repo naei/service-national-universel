@@ -2,7 +2,6 @@ import React, { useEffect, useState } from "react";
 import styled from "styled-components";
 import { Col, Row } from "reactstrap";
 import { Link } from "react-router-dom";
-import CircularProgress from "../components/CircularProgress";
 import {
   translate,
   MISSION_STATUS,
@@ -13,9 +12,10 @@ import {
   FORMAT,
   PROFESSIONNAL_PROJECT,
   PROFESSIONNAL_PROJECT_PRECISION,
-} from "../../../utils";
+} from "../../../../utils";
 
-import api from "../../../services/api";
+import api from "../../../../services/api";
+import CircularLine from "../components/CircularLine";
 
 export default ({ filter }) => {
   const [youngsDomains, setYoungsDomains] = useState({});
@@ -78,26 +78,29 @@ export default ({ filter }) => {
       if (filter.department) queries[3].query.bool.filter.push({ term: { "department.keyword": filter.department } });
 
       const { responses } = await api.esQuery(queries);
-      setMissionsStatus(responses[0].aggregations.status.buckets.reduce((acc, c) => ({ ...acc, [c.key]: c.doc_count }), {}));
-      setMissionsDomains(responses[0].aggregations.domains.buckets.reduce((acc, c) => ({ ...acc, [c.key]: c.doc_count }), {}));
-      setMissionsPeriod(responses[0].aggregations.period.buckets.reduce((acc, c) => ({ ...acc, [c.key]: c.doc_count }), {}));
-      setMissionsFormat(responses[0].aggregations.format.buckets.reduce((acc, c) => ({ ...acc, [c.key]: c.doc_count }), {}));
+      setStateAccumulated(setMissionsStatus, responses[0], "status");
+      setStateAccumulated(setMissionsDomains, responses[0], "domains");
+      setStateAccumulated(setMissionsPeriod, responses[0], "period");
+      setStateAccumulated(setMissionsFormat, responses[0], "format");
       setMissionPlaceTotal(responses[0].aggregations.placesTotal.value);
       setMissionPlaceLeft(responses[0].aggregations.placesLeft.value);
-
-      setMobilityNearSchool(responses[1].aggregations.mobilityNearSchool.buckets.reduce((acc, c) => ({ ...acc, [c.key]: c.doc_count }), {}));
-      setMobilityNearHome(responses[1].aggregations.mobilityNearHome.buckets.reduce((acc, c) => ({ ...acc, [c.key]: c.doc_count }), {}));
-      setMobilityNearRelative(responses[1].aggregations.mobilityNearRelative.buckets.reduce((acc, c) => ({ ...acc, [c.key]: c.doc_count }), {}));
-      setYoungsDomains(responses[1].aggregations.domains.buckets.reduce((acc, c) => ({ ...acc, [c.key]: c.doc_count }), {}));
-      setYoungsPeriod(responses[1].aggregations.period.buckets.reduce((acc, c) => ({ ...acc, [c.key]: c.doc_count }), {}));
-      setYoungsProfessionnalProject(responses[1].aggregations.professionnalProject.buckets.reduce((acc, c) => ({ ...acc, [c.key]: c.doc_count }), {}));
-      setYoungsEngaged(responses[1].aggregations.engaged.buckets.reduce((acc, c) => ({ ...acc, [c.key]: c.doc_count }), {}));
-      setYoungsProfessionnalProjectPrecision(responses[1].aggregations.professionnalProjectPrecision.buckets.reduce((acc, c) => ({ ...acc, [c.key]: c.doc_count }), {}));
-      setYoungsFormat(responses[1].aggregations.format.buckets.reduce((acc, c) => ({ ...acc, [c.key]: c.doc_count }), {}));
-      setMobilityTransport(responses[1].aggregations.mobilityTransport.buckets.reduce((acc, c) => ({ ...acc, [c.key]: c.doc_count }), {}));
+      setStateAccumulated(setMobilityNearSchool, responses[1], "mobilityNearSchool");
+      setStateAccumulated(setMobilityNearHome, responses[1], "mobilityNearHome");
+      setStateAccumulated(setMobilityNearRelative, responses[1], "mobilityNearRelative");
+      setStateAccumulated(setYoungsDomains, responses[1], "domains");
+      setStateAccumulated(setYoungsPeriod, responses[1], "period");
+      setStateAccumulated(setYoungsProfessionnalProject, responses[1], "professionnalProject");
+      setStateAccumulated(setYoungsEngaged, responses[1], "engaged");
+      setStateAccumulated(setYoungsProfessionnalProjectPrecision, responses[1], "professionnalProjectPrecision");
+      setStateAccumulated(setYoungsFormat, responses[1], "format");
+      setStateAccumulated(setMobilityTransport, responses[1], "mobilityTransport");
     }
     initStatus();
   }, [JSON.stringify(filter)]);
+
+  const setStateAccumulated = (f, r, a) => {
+    f(r.aggregations[a].buckets.reduce((acc, c) => ({ ...acc, [c.key]: c.doc_count }), {}));
+  };
 
   const replaceSpaces = (v) => v.replace(/\s+/g, "+");
 
@@ -189,10 +192,7 @@ const Status = ({ data, getLink }) => {
                   <CardTitle>{translate(l)}</CardTitle>
                   <CardValueWrapper>
                     <CardValue>{data[l] || 0}</CardValue>
-                    <CardPercentage>
-                      {total ? `${(((data[l] || 0) * 100) / total).toFixed(0)}%` : `0%`}
-                      <CardArrow />
-                    </CardPercentage>
+                    <CardPercentage>{total ? `${(((data[l] || 0) * 100) / total).toFixed(0)}%` : `0%`}</CardPercentage>
                   </CardValueWrapper>
                 </Card>
               </Link>
@@ -223,34 +223,21 @@ const MissionDetail = ({ youngsDomains, missionsDomains, getLink }) => {
         <hr />
         <Row>
           <Col md={6} xl={6} key="1">
-            {Object.values(MISSION_DOMAINS).map((l, k) => {
-              return (
-                <CircularLine key={k}>
-                  <CircularLineIndex>{`${k + 1}.`}</CircularLineIndex>
-                  <CircularProgress
-                    circleProgressColor="#1B7BBF"
-                    percentage={((missionsDomains[l] * 100) / totalMissions).toFixed(1)}
-                    title={translate(l)}
-                    subtitle={`${missionsDomains[l] || 0} missions`}
-                  />
-                </CircularLine>
-              );
-            })}
+            {Object.values(MISSION_DOMAINS).map((l, k) => (
+              <CircularLine index={`${k + 1}.`} key={k} value={missionsDomains[l]} total={totalMissions} title={translate(l)} subtitle={`${missionsDomains[l] || 0} missions`} />
+            ))}
           </Col>
           <Col md={6} xl={6} key="2">
-            {Object.values(MISSION_DOMAINS).map((l, k) => {
-              return (
-                <CircularLine key={k}>
-                  <CircularLineIndex>{`${k + 1}.`}</CircularLineIndex>
-                  <CircularProgress
-                    circleProgressColor="#1B7BBF"
-                    percentage={((youngsDomains[l] * 100) / totalYoungs).toFixed(1)}
-                    title={translate(l)}
-                    subtitle={`D'après ${youngsDomains[l] || 0} volontaires`}
-                  />
-                </CircularLine>
-              );
-            })}
+            {Object.values(MISSION_DOMAINS).map((l, k) => (
+              <CircularLine
+                index={`${k + 1}.`}
+                key={k}
+                value={youngsDomains[l]}
+                total={totalYoungs}
+                title={translate(l)}
+                subtitle={`D'après ${youngsDomains[l] || 0} volontaires`}
+              />
+            ))}
           </Col>
         </Row>
       </Box>
@@ -276,34 +263,14 @@ const Period = ({ youngsPeriod, missionsPeriod }) => {
         <hr />
         <Row>
           <Col md={6} xl={6} key="1">
-            {Object.values(PERIOD).map((l, k) => {
-              return (
-                <CircularLine key={k}>
-                  <CircularLineIndex>{`${k + 1}.`}</CircularLineIndex>
-                  <CircularProgress
-                    circleProgressColor="#1B7BBF"
-                    percentage={((missionsPeriod[l] * 100) / totalMissions).toFixed(1)}
-                    title={translate(l)}
-                    subtitle={`${missionsPeriod[l] || 0} missions`}
-                  />
-                </CircularLine>
-              );
-            })}
+            {Object.values(PERIOD).map((l, k) => (
+              <CircularLine index={`${k + 1}.`} key={k} value={missionsPeriod[l]} total={totalMissions} title={translate(l)} subtitle={`${missionsPeriod[l] || 0} missions`} />
+            ))}
           </Col>
           <Col md={6} xl={6} key="2">
-            {Object.values(PERIOD).map((l, k) => {
-              return (
-                <CircularLine key={k}>
-                  <CircularLineIndex>{`${k + 1}.`}</CircularLineIndex>
-                  <CircularProgress
-                    circleProgressColor="#1B7BBF"
-                    percentage={((youngsPeriod[l] * 100) / totalYoungs).toFixed(1)}
-                    title={translate(l)}
-                    subtitle={`D'après ${youngsPeriod[l] || 0} volontaires`}
-                  />
-                </CircularLine>
-              );
-            })}
+            {Object.values(PERIOD).map((l, k) => (
+              <CircularLine index={`${k + 1}.`} key={k} value={youngsPeriod[l]} total={totalYoungs} title={translate(l)} subtitle={`D'après ${youngsPeriod[l] || 0} volontaires`} />
+            ))}
           </Col>
         </Row>
       </Box>
@@ -329,41 +296,36 @@ const ProfessionalProject = ({ youngsProfessionnalProjectPrecision, youngsProfes
             {Object.values(PROFESSIONNAL_PROJECT).map((l, k) => {
               if (l !== "OTHER")
                 return (
-                  <CircularLine key={k}>
-                    <CircularLineIndex>{`${k + 1}.`}</CircularLineIndex>
-                    <CircularProgress
-                      circleProgressColor="#1B7BBF"
-                      percentage={((youngsProfessionnalProject[l] * 100) / total1).toFixed(1)}
-                      title={translate(l)}
-                      subtitle={`D'après ${youngsProfessionnalProject[l] || 0} volontaires`}
-                    />
-                  </CircularLine>
+                  <CircularLine
+                    index={`${k + 1}.`}
+                    key={k}
+                    value={youngsProfessionnalProject[l]}
+                    total={total1}
+                    title={translate(l)}
+                    subtitle={`D'après ${youngsProfessionnalProject[l] || 0} volontaires`}
+                  />
                 );
               return (
                 <Row key={k}>
                   <Col md={4}>
-                    <CircularLine>
-                      <CircularLineIndex>{`${k + 1}.`}</CircularLineIndex>
-                      <CircularProgress
-                        circleProgressColor="#1B7BBF"
-                        percentage={((youngsProfessionnalProject[l] * 100) / total1).toFixed(1)}
-                        title={translate(l)}
-                        subtitle={`D'après ${youngsProfessionnalProject[l] || 0} volontaires`}
-                      />
-                    </CircularLine>
+                    <CircularLine
+                      index={`${k + 1}.`}
+                      value={youngsProfessionnalProject[l]}
+                      total={total1}
+                      title={translate(l)}
+                      subtitle={`D'après ${youngsProfessionnalProject[l] || 0} volontaires`}
+                    />
                   </Col>
                   <div style={{ border: "1px solid #F2F1F1" }} />
                   {Object.values(PROFESSIONNAL_PROJECT_PRECISION).map((m, i) => {
                     return (
                       <Col md={2} key={i}>
-                        <CircularLine>
-                          <CircularProgress
-                            circleProgressColor="#1B7BBF"
-                            percentage={((youngsProfessionnalProjectPrecision[m] * 100) / total2).toFixed(1)}
-                            title={translate(m)}
-                            subtitle={`D'après ${youngsProfessionnalProjectPrecision[m] || 0} volontaires`}
-                          />
-                        </CircularLine>
+                        <CircularLine
+                          value={youngsProfessionnalProjectPrecision[m]}
+                          total={total2}
+                          title={translate(m)}
+                          subtitle={`D'après ${youngsProfessionnalProjectPrecision[m] || 0} volontaires`}
+                        />
                       </Col>
                     );
                   })}
@@ -395,34 +357,14 @@ const Format = ({ youngsFormat, missionsFormat }) => {
         <hr />
         <Row>
           <Col md={6} xl={6} key="1">
-            {Object.values(FORMAT).map((l, k) => {
-              return (
-                <CircularLine key={k}>
-                  <CircularLineIndex>{`${k + 1}.`}</CircularLineIndex>
-                  <CircularProgress
-                    circleProgressColor="#1B7BBF"
-                    percentage={((missionsFormat[l] * 100) / totalMissions).toFixed(1)}
-                    title={translate(l)}
-                    subtitle={`${missionsFormat[l] || 0} missions`}
-                  />
-                </CircularLine>
-              );
-            })}
+            {Object.values(FORMAT).map((l, k) => (
+              <CircularLine index={`${k + 1}.`} key={k} value={missionsFormat[l]} total={totalMissions} title={translate(l)} subtitle={`${missionsFormat[l] || 0} missions`} />
+            ))}
           </Col>
           <Col md={6} xl={6} key="2">
-            {Object.values(FORMAT).map((l, k) => {
-              return (
-                <CircularLine key={k}>
-                  <CircularLineIndex>{`${k}.`}</CircularLineIndex>
-                  <CircularProgress
-                    circleProgressColor="#1B7BBF"
-                    percentage={((youngsFormat[l] * 100) / totalYoungs).toFixed(1)}
-                    title={translate(l)}
-                    subtitle={`D'après ${youngsFormat[l] || 0} volontaires`}
-                  />
-                </CircularLine>
-              );
-            })}
+            {Object.values(FORMAT).map((l, k) => (
+              <CircularLine index={`${k + 1}.`} key={k} value={youngsFormat[l]} total={totalYoungs} title={translate(l)} subtitle={`D'après ${youngsFormat[l] || 0} volontaires`} />
+            ))}
           </Col>
         </Row>
       </Box>
@@ -448,49 +390,34 @@ const Mobility = ({ mobilityNearHome, mobilityNearRelative, mobilityNearSchool, 
         <Row>
           <Col md={6} xl={6} key="1">
             <div>Mission à proximité de </div>
-            <CircularLine>
-              <CircularLineIndex>{`1.`}</CircularLineIndex>
-              <CircularProgress
-                circleProgressColor="#1B7BBF"
-                percentage={((mobilityNearHome["true"] * 100) / totalNearHome).toFixed(1)}
-                title="Leurs domiciles"
-                subtitle={`D'après ${totalNearHome || 0} volontaires`}
-              />
-            </CircularLine>
-            <CircularLine>
-              <CircularLineIndex>{`2.`}</CircularLineIndex>
-              <CircularProgress
-                circleProgressColor="#1B7BBF"
-                percentage={((mobilityNearSchool["true"] * 100) / totalNearSchool).toFixed(1)}
-                title="Leurs établissements"
-                subtitle={`D'après ${totalNearSchool || 0} volontaires`}
-              />
-            </CircularLine>
-            <CircularLine>
-              <CircularLineIndex>{`3.`}</CircularLineIndex>
-              <CircularProgress
-                circleProgressColor="#1B7BBF"
-                percentage={((mobilityNearRelative["true"] * 100) / totalNearRelative).toFixed(1)}
-                title="Hébergement chez un proche"
-                subtitle={`D'après ${totalNearRelative || 0} volontaires`}
-              />
-            </CircularLine>
+            <CircularLine index="1." value={mobilityNearHome["true"]} total={totalNearHome} title="Leurs domiciles" subtitle={`D'après ${totalNearHome || 0} volontaires`} />
+            <CircularLine
+              index="2."
+              value={mobilityNearSchool["true"]}
+              total={totalNearSchool}
+              title="Leurs établissements"
+              subtitle={`D'après ${totalNearSchool || 0} volontaires`}
+            />
+            <CircularLine
+              index="3."
+              value={mobilityNearRelative["true"]}
+              total={totalNearRelative}
+              title="Hébergement chez un proche"
+              subtitle={`D'après ${totalNearRelative || 0} volontaires`}
+            />
           </Col>
           <Col md={6} xl={6} key="2">
             <div>Moyen(s) de transport privilégié</div>
-            {Object.values(TRANSPORT).map((l, k) => {
-              return (
-                <CircularLine key={k}>
-                  <CircularLineIndex>{`${k + 1}.`}</CircularLineIndex>
-                  <CircularProgress
-                    circleProgressColor="#1B7BBF"
-                    percentage={((mobilityTransport[l] * 100) / totalMobilityTransport).toFixed(1)}
-                    title={translate(l)}
-                    subtitle={`D'après ${mobilityTransport[l] || 0} volontaires`}
-                  />
-                </CircularLine>
-              );
-            })}
+            {Object.values(TRANSPORT).map((l, k) => (
+              <CircularLine
+                key={k}
+                index={`${k + 1}.`}
+                value={mobilityTransport[l]}
+                total={totalMobilityTransport}
+                title={translate(l)}
+                subtitle={`D'après ${mobilityTransport[l] || 0} volontaires`}
+              />
+            ))}
           </Col>
         </Row>
       </Box>
@@ -512,26 +439,10 @@ const Volonteer = ({ youngsEngaged }) => {
         <hr />
         <Row>
           <Col md={6} xl={6} key="1">
-            <CircularLine>
-              <CircularLineIndex>{`1.`}</CircularLineIndex>
-              <CircularProgress
-                circleProgressColor="#1B7BBF"
-                percentage={(((youngsEngaged["false"] || 0) * 100) / total).toFixed(1)}
-                title="Non"
-                subtitle={`D'après ${total} volontaires`}
-              />
-            </CircularLine>
+            <CircularLine index="1." value={youngsEngaged["false"]} total={total} title="Non" subtitle={`D'après ${total} volontaires`} />
           </Col>
           <Col md={6} xl={6} key="2">
-            <CircularLine>
-              <CircularLineIndex>{`2.`}</CircularLineIndex>
-              <CircularProgress
-                circleProgressColor="#1B7BBF"
-                percentage={(((youngsEngaged["true"] || 0) * 100) / total).toFixed(1)}
-                title="Oui"
-                subtitle={`D'après ${total} volontaires`}
-              />
-            </CircularLine>
+            <CircularLine index="2." value={youngsEngaged["true"]} total={total} title="Oui" subtitle={`D'après ${total} volontaires`} />
           </Col>
         </Row>
       </Box>
@@ -561,16 +472,6 @@ const CardTitle = styled.h3`
   font-weight: bold;
 `;
 
-const CircularLine = styled.div`
-  margin-bottom: 20px;
-  display: flex;
-  align-items: center;
-`;
-const CircularLineIndex = styled.div`
-  margin-right: 30px;
-  color: #9a9a9a;
-  font-size: 16px;
-`;
 const Box = styled.div`
   background-color: #fff;
   filter: drop-shadow(0px 2px 4px rgba(0, 0, 0, 0.05));
@@ -603,14 +504,4 @@ const CardPercentage = styled.span`
   display: flex;
   align-items: center;
   font-weight: 100;
-`;
-
-const CardArrow = styled.span`
-  position: absolute;
-  top: 50%;
-  right: 0;
-  transform: translateY(-50%);
-  width: 15px;
-  height: 15px;
-  background-image: url(${require("../../../assets/arrow.png")});
 `;
