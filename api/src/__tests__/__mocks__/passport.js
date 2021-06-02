@@ -1,10 +1,11 @@
+const mongoose = require("mongoose");
 const passport = jest.createMockFromModule("passport");
+const getNewReferentFixture = require("../fixtures/referent");
 
 passport.authenticate = (type) => {
   return (req, res, next) => {
-    req.user = {
-      _id: "5feaff5bd23d7f30846d5f00",
-    };
+    req.user = getNewReferentFixture();
+    req.user._id = mongoose.Types.ObjectId();
     next();
   };
 };
