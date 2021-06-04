@@ -11,6 +11,7 @@ const getNewYoungFixture = require("./fixtures/young");
 const getNewReferentFixture = require("./fixtures/referent");
 const getNewProgramFixture = require("./fixtures/program");
 const getNewMissionFixture = require("./fixtures/mission");
+const getNewDepartmentServiceFixture = require("./fixtures/departmentService");
 
 const { getYoungsHelper, getYoungByEmailHelper, deleteYoungByEmailHelper, createYoungHelper, expectYoungToEqual } = require("./helpers/young");
 
@@ -37,6 +38,14 @@ const {
   createReferentHelper,
   expectReferentToEqual,
 } = require("./helpers/referent");
+
+const {
+  getDepartmentServicesHelper,
+  getDepartmentServiceByServiceNameHelper,
+  deleteDepartmentServiceByServiceNameHelper,
+  createDepartmentServiceHelper,
+  expectDepartmentServiceToEqual,
+} = require("./helpers/departmentService");
 
 let db;
 
@@ -199,7 +208,7 @@ describe("Mission", () => {
   // It looks like findOne send attributes defined by the model (Date => Date)
   // Expect doesn't work because Date != string
 
-  it("/PUT /mission/:id", async () => {
+  it("PUT /mission/:id", async () => {
     const missionFixture = getNewMissionFixture();
     let mission = await createMissionHelper(missionFixture);
     const modifiedMission = { ...missionFixture };
@@ -209,5 +218,27 @@ describe("Mission", () => {
     mission = await getMissionByNameHelper(missionFixture.name);
     expectMissionToEqual(modifiedMission, mission);
     await deleteMissionByNameHelper(missionFixture.name);
+  });
+
+  it("DELETE /mission/:id", async () => {
+    const missionFixture = getNewMissionFixture();
+    let mission = await createMissionHelper(missionFixture);
+    const missionsBefore = await getMissionsHelper();
+    const res = await request(getAppHelper()).delete(`/mission/${mission._id}`).send();
+    expect(res.statusCode).toEqual(200);
+    const missionsAfter = await getMissionsHelper();
+    expect(missionsAfter.length).toEqual(missionsBefore.length - 1);
+  });
+});
+
+describe("Department service", () => {
+  it("POST /department-service", async () => {
+    const departmentServiceFixture = getNewDepartmentServiceFixture();
+    const departmentServicesBefore = await getDepartmentServicesHelper();
+    const res = await request(getAppHelper()).post("/department-service").send(departmentServiceFixture);
+    expect(res.statusCode).toEqual(200);
+    const departmentServiceAfter = await getDepartmentServicesHelper();
+    expect(departmentServiceAfter.length).toEqual(departmentServicesBefore.length + 1);
+    await deleteDepartmentServiceByServiceNameHelper(departmentServiceFixture.serviceName);
   });
 });
