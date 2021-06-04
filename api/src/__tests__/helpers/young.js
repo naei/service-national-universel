@@ -18,17 +18,21 @@ async function createYoungHelper(young) {
 }
 
 function expectYoungToEqual(young, expectedYoung) {
-  expect(young.region).toEqual(expectedYoung.region);
-  expect(young.department).toEqual(expectedYoung.department);
-  expect(young.firstName).toEqual(expectedYoung.firstName);
-  expect(young.lastName).toEqual(expectedYoung.lastName);
-  expect(young.email).toEqual(expectedYoung.email);
-  expect(young.phone).toEqual(expectedYoung.phone);
-  expect(young.birthCountry).toEqual(expectedYoung.birthCountry);
-  expect(young.zip).toEqual(expectedYoung.zip);
-  expect(young.city).toEqual(expectedYoung.city);
-  expect(young.cityCode).toEqual(expectedYoung.cityCode);
-  expect(young.gender).toEqual(expectedYoung.gender);
+  // Switch every attributes type of JSON object to string
+  // Avoid type errors
+  const youngAttributesToString = JSON.parse(JSON.stringify(young));
+  const expectedYoungAttributesToString = JSON.parse(JSON.stringify(expectedYoung));
+  expect(youngAttributesToString.region).toEqual(expectedYoungAttributesToString.region);
+  expect(youngAttributesToString.department).toEqual(expectedYoungAttributesToString.department);
+  expect(youngAttributesToString.firstName).toEqual(expectedYoungAttributesToString.firstName);
+  expect(youngAttributesToString.lastName).toEqual(expectedYoungAttributesToString.lastName);
+  expect(youngAttributesToString.email).toEqual(expectedYoungAttributesToString.email);
+  expect(youngAttributesToString.phone).toEqual(expectedYoungAttributesToString.phone);
+  expect(youngAttributesToString.birthCountry).toEqual(expectedYoungAttributesToString.birthCountry);
+  expect(youngAttributesToString.zip).toEqual(expectedYoungAttributesToString.zip);
+  expect(youngAttributesToString.city).toEqual(expectedYoungAttributesToString.city);
+  expect(youngAttributesToString.cityCode).toEqual(expectedYoungAttributesToString.cityCode);
+  expect(youngAttributesToString.gender).toEqual(expectedYoungAttributesToString.gender);
 }
 
 module.exports = {

@@ -18,14 +18,18 @@ async function createProgramHelper(program) {
 }
 
 function expectProgramToEqual(program, expectedProgram) {
-  expect(program.name).toEqual(expectedProgram.name);
-  expect(program.department).toEqual(expectedProgram.department);
-  expect(program.region).toEqual(expectedProgram.region);
-  expect(program.type).toEqual(expectedProgram.type);
-  expect(program.url).toEqual(expectedProgram.url);
-  expect(program.descriptionDuration).toEqual(expectedProgram.descriptionDuration);
-  expect(program.descriptionMoney).toEqual(expectedProgram.descriptionMoney);
-  expect(program.descriptionFor).toEqual(expectedProgram.descriptionFor);
+  // Switch every attributes type of JSON object to string
+  // Avoid type errors
+  const programAttributesToString = JSON.parse(JSON.stringify(program));
+  const expectedProgramAttributesToString = JSON.parse(JSON.stringify(expectedProgram));
+  expect(programAttributesToString.name).toEqual(expectedProgramAttributesToString.name);
+  expect(programAttributesToString.department).toEqual(expectedProgramAttributesToString.department);
+  expect(programAttributesToString.region).toEqual(expectedProgramAttributesToString.region);
+  expect(programAttributesToString.type).toEqual(expectedProgramAttributesToString.type);
+  expect(programAttributesToString.url).toEqual(expectedProgramAttributesToString.url);
+  expect(programAttributesToString.descriptionDuration).toEqual(expectedProgramAttributesToString.descriptionDuration);
+  expect(programAttributesToString.descriptionMoney).toEqual(expectedProgramAttributesToString.descriptionMoney);
+  expect(programAttributesToString.descriptionFor).toEqual(expectedProgramAttributesToString.descriptionFor);
 }
 
 module.exports = {

@@ -18,25 +18,29 @@ async function createMissionHelper(mission) {
 }
 
 function expectMissionToEqual(mission, expectedMission) {
-  expect(mission.name).toEqual(expectedMission.name);
-  expect(mission.startAt).toEqual(expectedMission.startAt);
-  expect(mission.endAt).toEqual(expectedMission.endAt);
-  expect(mission.placesTotal).toEqual(expectedMission.placesTotal);
-  expect(mission.placesLeft).toEqual(expectedMission.placesLeft);
-  expect(mission.actions).toEqual(expectedMission.actions);
-  expect(mission.description).toEqual(expectedMission.description);
-  expect(mission.justifications).toEqual(expectedMission.justifications);
-  expect(mission.contraintes).toEqual(expectedMission.contraintes);
-  expect(mission.structureName).toEqual(expectedMission.structureName);
-  expect(mission.address).toEqual(expectedMission.address);
-  expect(mission.zip).toEqual(expectedMission.zip);
-  expect(mission.city).toEqual(expectedMission.city);
-  expect(mission.department).toEqual(expectedMission.department);
-  expect(mission.region).toEqual(expectedMission.region);
-  expect(mission.country).toEqual(expectedMission.country);
-  expect(mission.remote).toEqual(expectedMission.remote);
-  expect(mission.location.lat).toEqual(expectedMission.location.lat);
-  expect(mission.location.lon).toEqual(expectedMission.location.lon);
+  // Switch every attributes type of JSON object to string
+  // Avoid type errors
+  const missionAttributesToString = JSON.parse(JSON.stringify(mission));
+  const expectedMissionAttributesToString = JSON.parse(JSON.stringify(expectedMission));
+  expect(missionAttributesToString.name).toEqual(expectedMissionAttributesToString.name);
+  expect(missionAttributesToString.startAt).toEqual(expectedMissionAttributesToString.startAt);
+  expect(missionAttributesToString.endAt).toEqual(expectedMissionAttributesToString.endAt);
+  expect(missionAttributesToString.placesTotal).toEqual(expectedMissionAttributesToString.placesTotal);
+  expect(missionAttributesToString.placesLeft).toEqual(expectedMissionAttributesToString.placesLeft);
+  expect(missionAttributesToString.actions).toEqual(expectedMissionAttributesToString.actions);
+  expect(missionAttributesToString.description).toEqual(expectedMissionAttributesToString.description);
+  expect(missionAttributesToString.justifications).toEqual(expectedMissionAttributesToString.justifications);
+  expect(missionAttributesToString.contraintes).toEqual(expectedMissionAttributesToString.contraintes);
+  expect(missionAttributesToString.structureName).toEqual(expectedMissionAttributesToString.structureName);
+  expect(missionAttributesToString.address).toEqual(expectedMissionAttributesToString.address);
+  expect(missionAttributesToString.zip).toEqual(expectedMissionAttributesToString.zip);
+  expect(missionAttributesToString.city).toEqual(expectedMissionAttributesToString.city);
+  expect(missionAttributesToString.department).toEqual(expectedMissionAttributesToString.department);
+  expect(missionAttributesToString.region).toEqual(expectedMissionAttributesToString.region);
+  expect(missionAttributesToString.country).toEqual(expectedMissionAttributesToString.country);
+  expect(missionAttributesToString.remote).toEqual(expectedMissionAttributesToString.remote);
+  expect(missionAttributesToString.location.lat).toEqual(expectedMissionAttributesToString.location.lat);
+  expect(missionAttributesToString.location.lon).toEqual(expectedMissionAttributesToString.location.lon);
 }
 
 module.exports = {

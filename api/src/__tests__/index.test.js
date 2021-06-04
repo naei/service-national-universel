@@ -207,7 +207,6 @@ describe("Mission", () => {
     const res = await request(getAppHelper()).put(`/mission/${mission._id}`).send(modifiedMission);
     expect(res.statusCode).toEqual(200);
     mission = await getMissionByNameHelper(missionFixture.name);
-    mission = JSON.parse(JSON.stringify(mission));
     expectMissionToEqual(modifiedMission, mission);
     await deleteMissionByNameHelper(missionFixture.name);
   });

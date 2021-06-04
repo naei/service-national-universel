@@ -18,14 +18,18 @@ async function createReferentHelper(referent) {
 }
 
 function expectReferentToEqual(referent, expectedReferent) {
-  expect(referent.region).toEqual(expectedReferent.region);
-  expect(referent.department).toEqual(expectedReferent.department);
-  expect(referent.firstName).toEqual(expectedReferent.firstName);
-  expect(referent.lastName).toEqual(expectedReferent.lastName);
-  expect(referent.email).toEqual(expectedReferent.email);
-  expect(referent.phone).toEqual(expectedReferent.phone);
-  expect(referent.mobile).toEqual(expectedReferent.mobile);
-  expect(referent.role).toEqual(expectedReferent.role);
+  // Switch every attributes type of JSON object to string
+  // Avoid type errors
+  const referentAttributesToString = JSON.parse(JSON.stringify(referent));
+  const expectedReferentAttributesToString = JSON.parse(JSON.stringify(expectedReferent));
+  expect(referentAttributesToString.region).toEqual(expectedReferentAttributesToString.region);
+  expect(referentAttributesToString.department).toEqual(expectedReferentAttributesToString.department);
+  expect(referentAttributesToString.firstName).toEqual(expectedReferentAttributesToString.firstName);
+  expect(referentAttributesToString.lastName).toEqual(expectedReferentAttributesToString.lastName);
+  expect(referentAttributesToString.email).toEqual(expectedReferentAttributesToString.email);
+  expect(referentAttributesToString.phone).toEqual(expectedReferentAttributesToString.phone);
+  expect(referentAttributesToString.mobile).toEqual(expectedReferentAttributesToString.mobile);
+  expect(referentAttributesToString.role).toEqual(expectedReferentAttributesToString.role);
 }
 
 module.exports = {
