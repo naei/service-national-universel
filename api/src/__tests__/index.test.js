@@ -193,4 +193,22 @@ describe("Mission", () => {
     expectMissionToEqual(missionFixture, res.body.data);
     await deleteMissionByNameHelper(missionFixture.name);
   });
+
+  // Problem with GET from API and findOne from Mongoose
+  // It looks like GET always send some attributes in string (Date => string)
+  // It looks like findOne send attributes defined by the model (Date => Date)
+  // Expect doesn't work because Date != string
+
+  it("/PUT /mission/:id", async () => {
+    const missionFixture = getNewMissionFixture();
+    let mission = await createMissionHelper(missionFixture);
+    const modifiedMission = { ...missionFixture };
+    modifiedMission.startAt = faker.date.past().toISOString();
+    const res = await request(getAppHelper()).put(`/mission/${mission._id}`).send(modifiedMission);
+    expect(res.statusCode).toEqual(200);
+    mission = await getMissionByNameHelper(missionFixture.name);
+    mission = JSON.parse(JSON.stringify(mission));
+    expectMissionToEqual(modifiedMission, mission);
+    await deleteMissionByNameHelper(missionFixture.name);
+  });
 });
