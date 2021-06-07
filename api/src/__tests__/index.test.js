@@ -241,4 +241,17 @@ describe("Department service", () => {
     expect(departmentServiceAfter.length).toEqual(departmentServicesBefore.length + 1);
     await deleteDepartmentServiceByServiceNameHelper(departmentServiceFixture.serviceName);
   });
+
+  it("GET /department-service/referent/:id", async () => {
+    const referentFixture = getNewReferentFixture();
+    const referent = await createReferentHelper(referentFixture);
+    let departmentServiceFixture = getDepartmentServicesHelper();
+    departmentServiceFixture.department = referentFixture.department;
+    const departmentService = await createDepartmentServiceHelper(departmentServiceFixture);
+    const res = await request(getAppHelper()).get(`/department-service/referent/${referent._id}`).send();
+    expect(res.statusCode).toEqual(200);
+    expectDepartmentServiceToEqual(departmentServiceFixture, res.body.data);
+    await deleteDepartmentServiceByServiceNameHelper(departmentServiceFixture.name);
+    await deleteReferentByEmailHelper(referentFixture.email);
+  });
 });
