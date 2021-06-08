@@ -13,6 +13,7 @@ function getAppHelper() {
   app.use("/program", require("../../controllers/program"));
   app.use("/mission", require("../../controllers/mission"));
   app.use("/department-service", require("../../controllers/department-service"));
+  app.use("/cohesion-center", require("../../controllers/cohesion-center"));
   return app;
 }
 

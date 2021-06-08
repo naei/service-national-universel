@@ -12,6 +12,7 @@ const getNewReferentFixture = require("./fixtures/referent");
 const getNewProgramFixture = require("./fixtures/program");
 const getNewMissionFixture = require("./fixtures/mission");
 const getNewDepartmentServiceFixture = require("./fixtures/departmentService");
+const getNewCohesionCenterFixture = require("./fixtures/cohesionCenter");
 
 const { getYoungsHelper, getYoungByEmailHelper, deleteYoungByEmailHelper, createYoungHelper, expectYoungToEqual } = require("./helpers/young");
 
@@ -46,6 +47,14 @@ const {
   createDepartmentServiceHelper,
   expectDepartmentServiceToEqual,
 } = require("./helpers/departmentService");
+
+const {
+  getCohesionCentersHelper,
+  getCohesionCenterByNameHelper,
+  deleteCohesionCenterByNameHelper,
+  createCohesionCenterHelper,
+  expectCohesionCenterToEqual,
+} = require("./helpers/cohesionCenter");
 
 let db;
 
@@ -247,11 +256,23 @@ describe("Department service", () => {
     const referent = await createReferentHelper(referentFixture);
     let departmentServiceFixture = getDepartmentServicesHelper();
     departmentServiceFixture.department = referentFixture.department;
-    const departmentService = await createDepartmentServiceHelper(departmentServiceFixture);
+    await createDepartmentServiceHelper(departmentServiceFixture);
     const res = await request(getAppHelper()).get(`/department-service/referent/${referent._id}`).send();
     expect(res.statusCode).toEqual(200);
     expectDepartmentServiceToEqual(departmentServiceFixture, res.body.data);
     await deleteDepartmentServiceByServiceNameHelper(departmentServiceFixture.name);
     await deleteReferentByEmailHelper(referentFixture.email);
+  });
+});
+
+describe("Cohesion center", () => {
+  it("POST /cohesion-center", async () => {
+    const cohesionCenterFixture = getNewCohesionCenterFixture();
+    const cohesionCentersBefore = await getCohesionCentersHelper();
+    const res = await request(getAppHelper()).post("/cohesion-center").send(cohesionCenterFixture);
+    expect(res.statusCode).toEqual(200);
+    const cohesionCentersAfter = await getCohesionCentersHelper();
+    expect(cohesionCentersAfter.length).toEqual(cohesionCentersBefore.length + 1);
+    await deleteCohesionCenterByNameHelper(cohesionCenterFixture.name);
   });
 });
