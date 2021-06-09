@@ -18,20 +18,16 @@ async function createDepartmentServiceHelper(departmentService) {
 }
 
 function expectDepartmentServiceToEqual(departmentService, expectedDepartmentService) {
-  // Switch every attributes type of JSON object to string
-  // Avoid type errors
-  const departmentServiceAttributesToString = JSON.parse(JSON.stringify(departmentService));
-  const expectedDepartmentServiceAttributesToString = JSON.parse(JSON.stringify(expectedDepartmentService));
-  expect(departmentServiceAttributesToString.department).toEqual(expectedDepartmentServiceAttributesToString.department);
-  expect(departmentServiceAttributesToString.region).toEqual(expectedDepartmentServiceAttributesToString.region);
-  expect(departmentServiceAttributesToString.directionName).toEqual(expectedDepartmentServiceAttributesToString.directionName);
-  expect(departmentServiceAttributesToString.serviceName).toEqual(expectedDepartmentServiceAttributesToString.serviceName);
-  expect(departmentServiceAttributesToString.serviceNumber).toEqual(expectedDepartmentServiceAttributesToString.serviceNumber);
-  expect(departmentServiceAttributesToString.address).toEqual(expectedDepartmentServiceAttributesToString.address);
-  expect(departmentServiceAttributesToString.complementAddress).toEqual(expectedDepartmentServiceAttributesToString.complementAddress);
-  expect(departmentServiceAttributesToString.zip).toEqual(expectedDepartmentServiceAttributesToString.zip);
-  expect(departmentServiceAttributesToString.city).toEqual(expectedDepartmentServiceAttributesToString.city);
-  expect(departmentServiceAttributesToString.description).toEqual(expectedDepartmentServiceAttributesToString.description);
+  expect(departmentService.department).toEqual(expectedDepartmentService.department);
+  expect(departmentService.region).toEqual(expectedDepartmentService.region);
+  expect(departmentService.directionName).toEqual(expectedDepartmentService.directionName);
+  expect(departmentService.serviceName).toEqual(expectedDepartmentService.serviceName);
+  expect(departmentService.serviceNumber).toEqual(expectedDepartmentService.serviceNumber);
+  expect(departmentService.address).toEqual(expectedDepartmentService.address);
+  expect(departmentService.complementAddress).toEqual(expectedDepartmentService.complementAddress);
+  expect(departmentService.zip).toEqual(expectedDepartmentService.zip);
+  expect(departmentService.city).toEqual(expectedDepartmentService.city);
+  expect(departmentService.description).toEqual(expectedDepartmentService.description);
 }
 
 module.exports = {

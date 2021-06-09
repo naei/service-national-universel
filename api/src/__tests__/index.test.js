@@ -221,7 +221,7 @@ describe("Mission", () => {
     const missionFixture = getNewMissionFixture();
     let mission = await createMissionHelper(missionFixture);
     const modifiedMission = { ...missionFixture };
-    modifiedMission.startAt = faker.date.past().toISOString();
+    modifiedMission.startAt = faker.date.past();
     const res = await request(getAppHelper()).put(`/mission/${mission._id}`).send(modifiedMission);
     expect(res.statusCode).toEqual(200);
     mission = await getMissionByNameHelper(missionFixture.name);
@@ -273,6 +273,15 @@ describe("Cohesion center", () => {
     expect(res.statusCode).toEqual(200);
     const cohesionCentersAfter = await getCohesionCentersHelper();
     expect(cohesionCentersAfter.length).toEqual(cohesionCentersBefore.length + 1);
+    await deleteCohesionCenterByNameHelper(cohesionCenterFixture.name);
+  });
+
+  it("GET /cohesion-center/:id", async () => {
+    const cohesionCenterFixture = getNewCohesionCenterFixture();
+    const cohesionCenter = await createCohesionCenterHelper(cohesionCenterFixture);
+    const res = await request(getAppHelper()).get(`/cohesion-center/${cohesionCenter._id}`).send();
+    expect(res.statusCode).toEqual(200);
+    expectCohesionCenterToEqual(cohesionCenterFixture, res.body.data);
     await deleteCohesionCenterByNameHelper(cohesionCenterFixture.name);
   });
 });

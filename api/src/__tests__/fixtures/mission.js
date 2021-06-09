@@ -6,8 +6,8 @@ function getNewMissionFixture() {
   return {
     name: faker.name.findName(),
     domains: [],
-    startAt: faker.date.past().toISOString(),
-    endAt: faker.date.past().toISOString(),
+    startAt: faker.date.past(),
+    endAt: faker.date.past(),
     format: "CONTINUOUS",
     frequence: "",
     period: [],
@@ -30,8 +30,8 @@ function getNewMissionFixture() {
     region: faker.address.state(),
     country: faker.address.country(),
     location: {
-      lat: Number(faker.address.latitude()),
-      lon: Number(faker.address.longitude()),
+      lat: faker.address.latitude(),
+      lon: faker.address.longitude(),
     },
     remote: faker.lorem.sentences(),
   };
