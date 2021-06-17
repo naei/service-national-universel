@@ -26,7 +26,6 @@ export default () => {
     return { query: { match_all: {} } };
   };
   const getExportQuery = () => ({ ...getDefaultQuery(), size: 10000 });
-
   useEffect(() => {
     if (user.role !== "supervisor") return;
     (async () => {
@@ -68,10 +67,10 @@ export default () => {
                     "Id de la structure": data.structureId,
                     "Nom de la structure": data.structureName,
                     Tuteur: data.tutorName,
-                    "Liste des domaines de la mission": data.domains,
+                    "Liste des domaines de la mission": translate(data.domains),
                     "Date du début": formatDateFR(data.startAt),
                     "Date de fin": formatDateFR(data.endAt),
-                    Format: data.format,
+                    Format: translate(data.format),
                     Fréquence: data.frequence,
                     Période: data.period,
                     "Places total": data.placesTotal,
@@ -83,7 +82,7 @@ export default () => {
                     Ville: data.city,
                     Département: data.department,
                     Région: data.region,
-                    Statut: data.status,
+                    Statut: translate(data.status),
                     "Créé lé": formatLongDateFR(data.createdAt),
                     "Mis à jour le": formatLongDateFR(data.updatedAt),
                   };
