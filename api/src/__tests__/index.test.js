@@ -260,9 +260,25 @@ describe("Application", () => {
   it("POST /application", async () => {
     // Realised structure needs to be done first
     // Applications in Missions in Structures
+    const structureFixture = getNewStructureFixture();
+    const structure = await createStructureHelper(structureFixture);
     let missionFixture = getNewMissionFixture();
-    mission.placesTotal = 1;
+    missionFixture.structureId = structure._id;
+    missionFixture.placesTotal = 1;
+    missionFixture.placesLeft = 1;
     const mission = await createMissionHelper(missionFixture);
-    const applicationFixture = getNewApplicationFixture();
+    let applicationFixture = getNewApplicationFixture();
+    applicationFixture.missionId = mission._id;
+    applicationFixture.missionName = mission.name;
+    applicationFixture.structureId = mission.structureId;
+    const applicationsBefore = await getApplicationsHelper();
+    const res = await request(getAppHelper()).post(`/application`).send(applicationFixture);
+    expect(res.statusCode).toEqual(200);
+    expectApplicationToEqual(res.body.data, applicationFixture);
+    const applicationsAfter = await getApplicationsHelper();
+    expect(applicationsAfter.length).toEqual(applicationsBefore.length + 1);
+    await deleteApplicationByIdHelper(res.body.data._id);
+    await deleteMissionByIdHelper(mission._id);
+    await deleteStructureByIdHelper(structure._id);
   });
 });

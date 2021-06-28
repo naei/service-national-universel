@@ -10,7 +10,7 @@ const MissionObject = require("../models/mission");
 const YoungObject = require("../models/young");
 const ReferentObject = require("../models/referent");
 const { sendEmail } = require("../sendinblue");
-const { ERRORS, validateId } = require("../utils");
+const { ERRORS } = require("../utils");
 const { validateId } = require("../utils/defaultValidate");
 const validateFromYoung = require("../utils/young");
 

@@ -56,7 +56,32 @@ function validateProgram(program) {
     .validate(program, { stripUnknown: true });
 }
 
+function validateApplication(application) {
+  return Joi.object()
+    .keys({
+      youngId: Joi.string().allow(null, ""),
+      youngFirstName: Joi.string().allow(null, ""),
+      youngLastName: Joi.string().allow(null, ""),
+      youngEmail: Joi.string().allow(null, ""),
+      youngBirthdateAt: Joi.string().allow(null, ""),
+      youngCity: Joi.string().allow(null, ""),
+      youngDepartment: Joi.string().allow(null, ""),
+      youngCohort: Joi.string().allow(null, ""),
+      missionId: Joi.string().allow(null, ""),
+      missionName: Joi.string().allow(null, ""),
+      missionDepartment: Joi.string().allow(null, ""),
+      missionRegion: Joi.string().allow(null, ""),
+      structureId: Joi.string().allow(null, ""),
+      tutorId: Joi.string().allow(null, ""),
+      tutorName: Joi.string().allow(null, ""),
+      priority: Joi.string().allow(null, ""),
+      status: Joi.string().allow(null, ""),
+    })
+    .validate(application, { stripUnknown: true });
+}
+
 module.exports = {
   validateMission,
   validateProgram,
+  validateApplication,
 };
