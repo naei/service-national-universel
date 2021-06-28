@@ -14,16 +14,20 @@ const getNewReferentFixture = require("./fixtures/referent");
 const getNewMissionFixture = require("./fixtures/mission");
 const getNewStructureFixture = require("./fixtures/structure");
 const getNewProgramFixture = require("./fixtures/program");
+const getNewApplicationFixture = require("./fixtures/application");
 
 const { getMissionsHelper, getMissionByIdHelper, deleteMissionByIdHelper, createMissionHelper, expectMissionToEqual } = require("./helpers/mission");
-
 const { getYoungsHelper, getYoungByIdHelper, deleteYoungByIdHelper, createYoungHelper, expectYoungToEqual } = require("./helpers/young");
-
 const { getReferentsHelper, deleteReferentByIdHelper } = require("./helpers/referent");
-
 const { deleteStructureByIdHelper, createStructureHelper, expectStructureToEqual } = require("./helpers/structure");
-
 const { getProgramsHelper, getProgramByIdHelper, deleteProgramByIdHelper, createProgramHelper, expectProgramToEqual } = require("./helpers/program");
+const {
+  getApplicationsHelper,
+  getApplicationByIdHelper,
+  deleteApplicationByIdHelper,
+  createApplicationHelper,
+  expectApplicationToEqual,
+} = require("./helpers/application");
 
 let db;
 
@@ -249,5 +253,16 @@ describe("Program", () => {
     expect(res.statusCode).toEqual(200);
     const programsAfter = await getProgramsHelper();
     expect(programsAfter.length).toEqual(programsBefore.length - 1);
+  });
+});
+
+describe("Application", () => {
+  it("POST /application", async () => {
+    // Realised structure needs to be done first
+    // Applications in Missions in Structures
+    let missionFixture = getNewMissionFixture();
+    mission.placesTotal = 1;
+    const mission = await createMissionHelper(missionFixture);
+    const applicationFixture = getNewApplicationFixture();
   });
 });

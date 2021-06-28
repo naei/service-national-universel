@@ -10,10 +10,14 @@ const MissionObject = require("../models/mission");
 const YoungObject = require("../models/young");
 const ReferentObject = require("../models/referent");
 const { sendEmail } = require("../sendinblue");
-const { ERRORS } = require("../utils");
+const { ERRORS, validateId } = require("../utils");
+const { validateId } = require("../utils/defaultValidate");
+const validateFromYoung = require("../utils/young");
 
 const updateStatusPhase2 = async (app) => {
-  const young = await YoungObject.findById(app.youngId);
+  const { error, value: checkedId } = validateId(app.youngId);
+  if (error) return;
+  const young = await YoungObject.findById(checkedId);
   const applications = await ApplicationObject.find({ youngId: young._id });
   young.set({ statusPhase2: "WAITING_REALISATION" });
   young.set({ phase2ApplicationStatus: applications.map((e) => e.status) });
@@ -37,7 +41,9 @@ const updateStatusPhase2 = async (app) => {
 const updatePlacesMission = async (app) => {
   try {
     // Get all application for the mission
-    const mission = await MissionObject.findById(app.missionId);
+    const { error, value: checkedId } = validateId(app.missionId);
+    if (error) return;
+    const mission = await MissionObject.findById(checkedId);
     const applications = await ApplicationObject.find({ missionId: mission._id });
     const placesTaken = applications.filter((application) => {
       return ["VALIDATED", "IN_PROGRESS", "DONE", "ABANDON"].includes(application.status);
@@ -56,7 +62,9 @@ const updatePlacesMission = async (app) => {
 
 router.post("/", passport.authenticate(["young", "referent"], { session: false }), async (req, res) => {
   try {
-    const obj = req.body;
+    const { error, value: checkedApplication } = validateFromYoung.validateApplication(req.body);
+    if (error) return res.status(400).send({ ok: false, code: ERRORS.INVALID_BODY, error });
+    const obj = checkedApplication;
     if (!obj.hasOwnProperty("priority")) {
       const applications = await ApplicationObject.find({ youngId: obj.youngId });
       applications.length;
@@ -74,7 +82,11 @@ router.post("/", passport.authenticate(["young", "referent"], { session: false }
 
 router.put("/", passport.authenticate(["referent", "young"], { session: false }), async (req, res) => {
   try {
-    const application = await ApplicationObject.findByIdAndUpdate(req.body._id, req.body, { new: true });
+    const { errorId, value: checkedId } = validateId(req.body._id);
+    if (errorId) return res.status(400).send({ ok: false, code: ERRORS.INVALID_URI, error });
+    const { errorApplication, value: checkedApplication } = validateFromYoung.validateApplication(req.body);
+    if (errorApplication) return res.status(400).send({ ok: false, code: ERRORS.INVALID_BODY, error });
+    const application = await ApplicationObject.findByIdAndUpdate(checkedId, checkedApplication, { new: true });
     await updateStatusPhase2(application);
     await updatePlacesMission(application);
     res.status(200).send({ ok: true, data: application });
@@ -86,7 +98,9 @@ router.put("/", passport.authenticate(["referent", "young"], { session: false })
 
 router.get("/:id", passport.authenticate("referent", { session: false }), async (req, res) => {
   try {
-    const data = await ApplicationObject.findOne({ _id: req.params.id });
+    const { error, value: checkedId } = validateId(req.params.id);
+    if (error) return res.status(400).send({ ok: false, code: ERRORS.INVALID_URI, error });
+    const data = await ApplicationObject.findOne({ _id: checkedId });
     if (!data) return res.status(404).send({ ok: false, code: ERRORS.NOT_FOUND });
     return res.status(200).send({ ok: true, data });
   } catch (error) {
@@ -97,15 +111,15 @@ router.get("/:id", passport.authenticate("referent", { session: false }), async 
 
 router.get("/young/:id", passport.authenticate(["referent", "young"], { session: false }), async (req, res) => {
   try {
-    let data = await ApplicationObject.find({ youngId: req.params.id });
+    const { error, value: checkedId } = validateId(req.params.id);
+    if (error) return res.status(400).send({ ok: false, code: ERRORS.INVALID_URI, error });
+    let data = await ApplicationObject.find({ youngId: checkedId });
     if (!data) return res.status(404).send({ ok: false, code: ERRORS.NOT_FOUND });
     for (let i = 0; i < data.length; i++) {
       const application = data[i]._doc;
       const mission = await MissionObject.findById(application.missionId);
       let tutor = {};
-      if (mission?.tutorId) tutor = await ReferentObject.findById(mission.tutorId);
-      if (mission?.tutorId && !application.tutorId) application.tutorId = mission.tutorId;
-      if (mission?.structureId && !application.structureId) application.structureId = mission.structureId;
+      if (mission) tutor = await ReferentObject.findById(mission.tutorId);
       data[i] = { ...application, mission, tutor };
     }
     return res.status(200).send({ ok: true, data });
@@ -117,7 +131,9 @@ router.get("/young/:id", passport.authenticate(["referent", "young"], { session:
 
 router.get("/mission/:id", passport.authenticate("referent", { session: false }), async (req, res) => {
   try {
-    const data = await ApplicationObject.find({ missionId: req.params.id });
+    const { error, value: checkedId } = validateId(req.params.id);
+    if (error) return res.status(400).send({ ok: false, code: ERRORS.INVALID_URI, error });
+    const data = await ApplicationObject.find({ missionId: checkedId });
     if (!data) return res.status(404).send({ ok: false, code: ERRORS.NOT_FOUND });
     for (let i = 0; i < data.length; i++) {
       const application = data[i]._doc;
@@ -134,7 +150,9 @@ router.get("/mission/:id", passport.authenticate("referent", { session: false })
 //@check
 router.delete("/:id", passport.authenticate("referent", { session: false }), async (req, res) => {
   try {
-    await MissionObject.findOneAndUpdate({ _id: req.params.id }, { deleted: "yes" });
+    const { error, value: checkedId } = validateId(req.params.id);
+    if (error) return res.status(400).send({ ok: false, code: ERRORS.INVALID_URI, error });
+    await MissionObject.findOneAndUpdate({ _id: checkedId }, { deleted: "yes" });
     res.status(200).send({ ok: true });
   } catch (error) {
     capture(error);
@@ -144,8 +162,10 @@ router.delete("/:id", passport.authenticate("referent", { session: false }), asy
 
 router.post("/:id/notify/:template", passport.authenticate(["referent", "young"], { session: false }), async (req, res) => {
   try {
-    const { id, template } = req.params;
-
+    const { errorId, value: checkedId } = validateId(req.params.id);
+    if (errorId) return res.status(400).send({ ok: false, code: ERRORS.INVALID_URI, error });
+    const id = checkedId;
+    const template = req.params.template;
     const application = await ApplicationObject.findById(id);
     if (!application) return res.status(404).send({ ok: false, code: ERRORS.NOT_FOUND });
     const mission = await MissionObject.findById(application.missionId);
@@ -191,7 +211,7 @@ router.post("/:id/notify/:template", passport.authenticate(["referent", "young"]
         .replace(/{{youngFirstName}}/g, application.youngFirstName)
         .replace(/{{youngLastName}}/g, application.youngLastName)
         .replace(/{{missionName}}/g, mission.name)
-        .replace(/{{cta}}/g, "https://inscription.snu.gouv.fr/auth/login?redirect=candidature");
+        .replace(/{{cta}}/g, "https://inscription.snu.gouv.fr");
       subject = `Votre candidature sur la mission d'intérêt général ${mission.name} a été validée`;
       to = { name: `${application.youngFirstName} ${application.youngLastName}`, email: application.youngEmail };
     } else if (template === "cancel") {
@@ -213,9 +233,7 @@ router.post("/:id/notify/:template", passport.authenticate(["referent", "young"]
         .replace(/{{lastName}}/g, application.youngLastName)
         .replace(/{{structureName}}/g, mission.structureName)
         .replace(/{{missionName}}/g, mission.name)
-        .replace(/{{message}}/g, req.body.message)
-        .replace(/{{cta}}/g, "https://inscription.snu.gouv.fr/auth/login?redirect=mission")
-        .replace(/\n/g, "<br/>");
+        .replace(/{{cta}}/g, "https://inscription.snu.gouv.fr/mission");
       subject = `Votre candidature sur la mission d'intérêt général ${mission.name} a été refusée.`;
       to = { name: `${application.youngFirstName} ${application.youngLastName}`, email: application.youngEmail };
     } else {
