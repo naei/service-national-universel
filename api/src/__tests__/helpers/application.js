@@ -22,6 +22,7 @@ function expectApplicationToEqual(application, expectedApplication) {
   // Deep equal failed on Date which became string
   const applicationParsed = JSON.parse(JSON.stringify(application));
   const expectedApplicationParsed = JSON.parse(JSON.stringify(expectedApplication));
+  expect(applicationParsed.youngId).toEqual(expectedApplicationParsed.youngId);
   expect(applicationParsed.youngFirstName).toEqual(expectedApplicationParsed.youngFirstName);
   expect(applicationParsed.youngLastName).toEqual(expectedApplicationParsed.youngLastName);
   expect(applicationParsed.youngEmail).toEqual(expectedApplicationParsed.youngEmail);

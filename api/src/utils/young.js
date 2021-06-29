@@ -72,6 +72,7 @@ function validateApplication(application) {
       missionDepartment: Joi.string().allow(null, ""),
       missionRegion: Joi.string().allow(null, ""),
       structureId: Joi.string().allow(null, ""),
+      contractId: Joi.string().allow(null, ""),
       tutorId: Joi.string().allow(null, ""),
       tutorName: Joi.string().allow(null, ""),
       priority: Joi.string().allow(null, ""),
