@@ -4,8 +4,6 @@ import { useSelector } from "react-redux";
 import { toastr } from "react-redux-toastr";
 import styled from "styled-components";
 
-import { Hero, HeroContainer, Separator } from "../../components/Content";
-
 //! This component isn't finished.
 
 export default () => {
@@ -37,7 +35,7 @@ export default () => {
       <Container>
         <section className="help-section">
           <h2>Besoin d'aide ?</h2>
-          <p style={{ color: "#6B7280", }}>Vous rencontrez un problème technique ou souhaitez en savoir plus sur les phases de votre parcours volontaire ? N'hésitez pas à consulter notre base de connaissance !</p>
+          <p style={{ color: "#6B7280", margin: "1.3rem" }}>Vous rencontrez un problème technique ou souhaitez en savoir plus sur les phases de votre parcours volontaire ? N'hésitez pas à consulter notre base de connaissance !</p>
           <LinkButton href="https://support.selego.co/help/fr-fr" target="_blank">
             Base de connaissance
           </LinkButton>
@@ -49,24 +47,24 @@ export default () => {
           <div className="division">
             <div className="block">
               <section>
-                <h5>{articles?.[49]?.title}</h5>
-                <p>Depuis l'onglet "Mission d'intérêt général", cliquez sur la rubrique "Trouver une mission"...</p>
+                <h5>{articles?.[39]?.title}</h5>
+                <p>Connectez vous à l'espace d'inscription structure, entrez vos informations et cliquez sur "Continuer"...</p>
               </section>
-              <a className="block-link" href="https://support.selego.co/help/fr-fr/13-phase-2-mission-d-interet-general/33-je-cherche-une-mission-mig" target="_blank">Lire la suite</a>
+              <a className="block-link" href="https://support.selego.co/help/fr-fr/8-mon-compte/45-je-cree-ma-structure" target="_blank">Lire la suite</a>
             </div>
             <div className="block">
               <section>
-                <h5>{articles?.[42]?.title}</h5>
-                <p>Connectez vous à votre espace volontaire, accédez à "Mon profil"...</p>
+                <h5>{articles?.[17]?.title}</h5>
+                <p>Vous pouvez ajouter d'autres responsables à votre structure en les invitant depuis votre profil...</p>
               </section>
-              <a className="block-link" href="https://support.selego.co/help/fr-fr/10-mon-compte/51-je-modifie-mon-identifiant-email" target="_blank">Lire la suite</a>
+              <a className="block-link" href="https://support.selego.co/help/fr-fr/8-mon-compte/20-j-invite-un-nouveau-responsable-pour-ma-structure" target="_blank">Lire la suite</a>
             </div>
             <div className="block">
               <section>
-                <h5>{articles?.[41]?.title}</h5>
-                <p>Les missions réalisées correspondent aux missions que vous avez déjà effectuées. En fonction du statut...</p>
+                <h5>{articles?.[44]?.title}</h5>
+                <p>Après validation de ma MIG par le référent départemental phase 2 , celle-ci est automatiquement...</p>
               </section>
-              <a className="block-link" href="https://support.selego.co/help/fr-fr/13-phase-2-mission-d-interet-general/38-je-consulte-mes-missions-realisees" target="_blank">Lire la suite</a>
+              <a className="block-link" href="https://support.selego.co/help/fr-fr/9-mes-mig/49-je-traite-les-candidatures" target="_blank">Lire la suite</a>
             </div>
           </div>
         </Card>
@@ -74,6 +72,14 @@ export default () => {
     </HeroContainer>
   )
 }
+
+export const HeroContainer = styled.div`
+  flex: 1;
+  padding: 1rem;
+  @media (max-width: 768px) {
+    padding: 1rem 0;
+  }
+`;
 
 const Container = styled.div`
   display: flex;
@@ -123,7 +129,7 @@ const Card = styled.div`
     border-radius: 0.5rem;
   }
   .block-link {
-
+    color: blue;
   }
 
   @media (min-width: 1024px) {

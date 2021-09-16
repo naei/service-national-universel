@@ -29,6 +29,7 @@ import Center from "./scenes/centers";
 import Inscription from "./scenes/inscription";
 import MeetingPoint from "./scenes/meetingPoint";
 import Bug from "./scenes/bug";
+import supportCenter from "./scenes/support-center";
 
 import Drawer from "./components/drawer";
 import Header from "./components/header";
@@ -62,7 +63,7 @@ export default () => {
         if (!res.ok || !res.user) return setLoading(false);
         if (res.token) api.setToken(res.token);
         if (res.user) dispatch(setUser(res.user));
-      } catch (e) {}
+      } catch (e) { }
       setLoading(false);
     }
     fetchData();
@@ -123,6 +124,7 @@ const Home = () => {
           <RestrictedRoute path="/contenu" component={Content} />
           <RestrictedRoute path="/objectifs" component={Goal} />
           <RestrictedRoute path="/centre" component={Center} />
+          <RestrictedRoute path="/support" component={supportCenter} />
           <RestrictedRoute path="/point-de-rassemblement" component={MeetingPoint} />
           <RestrictedRoute path="/" component={renderDashboard} />
         </Switch>

@@ -122,6 +122,7 @@ export default (props) => {
         {user.role === ROLES.RESPONSIBLE && responsible({ user, onClick: handleClick })}
         {user.role === ROLES.ADMIN && admin({ onClick: handleClick })}
         {[ROLES.REFERENT_DEPARTMENT, ROLES.REFERENT_REGION].includes(user.role) && referent({ onClick: handleClick })}
+        <DrawerTab to="/support" title="Centre d'aide" onClick={handleClick} />
       </ul>
     </Sidebar>
   );
