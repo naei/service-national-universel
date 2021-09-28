@@ -5,6 +5,8 @@ import { useSelector } from "react-redux";
 import { environment } from "../../config";
 import { ROLES, colors } from "../../utils";
 
+const SectionTitle = ({ title }) => <li className="section-title">{title}</li>;
+
 const DrawerTab = ({ title, to, onClick }) => (
   <li onClick={onClick}>
     <NavLink to={to}>{title}</NavLink>
@@ -34,13 +36,17 @@ function supervisor({ user, onClick }) {
 function admin({ onClick }) {
   return (
     <>
-      <DrawerTab to="/structure" title="Structures" onClick={onClick} />
-      <DrawerTab to="/mission" title="Missions" onClick={onClick} />
       <DrawerTab to="/user" title="Utilisateurs" onClick={onClick} />
       <DrawerTab to="/volontaire" title="Volontaires" onClick={onClick} />
+      <SectionTitle title="Phase inscription" />
       <DrawerTab to="/inscription" title="Inscriptions" onClick={onClick} />
+      <SectionTitle title="Phase 1 - Séjour de cohésion" />
       <DrawerTab to="/centre" title="Centres" onClick={onClick} />
       <DrawerTab to="/point-de-rassemblement" title="Points de rassemblement" onClick={onClick} />
+      <SectionTitle title="Phase 2 - MIG" />
+      <DrawerTab to="/structure" title="Structures" onClick={onClick} />
+      <DrawerTab to="/mission" title="Missions" onClick={onClick} />
+      <SectionTitle title="Autres" />
       <DrawerTab to="/contenu" title="Contenus" onClick={onClick} />
       <DrawerTab to="/objectifs" title="Objectifs" onClick={onClick} />
     </>
@@ -50,12 +56,16 @@ function admin({ onClick }) {
 function referent({ onClick }) {
   return (
     <>
-      <DrawerTab to="/structure" title="Structures" onClick={onClick} />
-      <DrawerTab to="/mission" title="Missions" onClick={onClick} />
       <DrawerTab to="/user" title="Utilisateurs" onClick={onClick} />
       <DrawerTab to="/volontaire" title="Volontaires" onClick={onClick} />
+      <SectionTitle title="Phase inscription" />
       <DrawerTab to="/inscription" title="Inscriptions" onClick={onClick} />
+      <SectionTitle title="Phase 1 - Séjour de cohésion" />
       <DrawerTab to="/centre" title="Centres" onClick={onClick} />
+      <SectionTitle title="Phase 2 - Mission d'intérêt général" />
+      <DrawerTab to="/structure" title="Structures" onClick={onClick} />
+      <DrawerTab to="/mission" title="Missions" onClick={onClick} />
+      <SectionTitle title="Autres" />
       <DrawerTab to="/contenu" title="Contenus" onClick={onClick} />
     </>
   );
@@ -212,11 +222,11 @@ const Sidebar = styled.div`
     list-style: none;
     a {
       text-decoration: none;
-      padding: 15px 20px;
+      padding: 0.8rem;
       display: block;
       color: #fff;
       font-weight: 400;
-      font-size: 16px;
+      font-size: 0.8rem;
       border-bottom: 1px solid ${colors.transPurple};
       transition: 0.2s;
       i {
@@ -231,6 +241,15 @@ const Sidebar = styled.div`
       font-weight: 700;
       background: ${colors.purple};
       box-shadow: 0px 4px 4px rgba(0, 0, 0, 0.1);
+    }
+    li.section-title {
+      margin-top: 1rem;
+      background-color: ${colors.extraDarkPurple};
+      text-decoration: none;
+      padding: 0.1rem 1rem;
+      color: #fff;
+      font-weight: 400;
+      font-size: 1rem;
     }
   }
   .has-child ul {
