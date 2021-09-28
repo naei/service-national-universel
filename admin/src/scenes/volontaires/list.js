@@ -17,6 +17,8 @@ import { Link } from "react-router-dom";
 import { RegionFilter, DepartmentFilter } from "../../components/filters";
 import Chevron from "../../components/Chevron";
 import { Filter, FilterRow, ResultTable, Table, ActionBox, Header, Title, MultiLine, Help, LockIcon, HelpText } from "../../components/list";
+import MultiDropdownListComponent from "../../components/list/MultiDropdownListComponent";
+import DataSearchComponent from "../../components/list/DataSearchComponent";
 
 const FILTERS = [
   "SEARCH",
@@ -202,21 +204,22 @@ export default () => {
             </Header>
             <Filter>
               <FilterRow visible>
-                <DataSearch
+                <DataSearchComponent
+                  name="Recherche"
                   defaultQuery={getDefaultQuery}
                   showIcon={false}
                   placeholder="Rechercher par prénom, nom, email, ville, code postal..."
                   componentId="SEARCH"
                   dataField={["email.keyword", "firstName", "lastName", "city", "zip"]}
                   react={{ and: FILTERS.filter((e) => e !== "SEARCH") }}
-                  // fuzziness={2}
                   style={{ flex: 1, marginRight: "1rem" }}
                   innerClass={{ input: "searchbox" }}
                   autosuggest={false}
                   URLParams={true}
                   queryFormat="and"
                 />
-                <MultiDropdownList
+                <MultiDropdownListComponent
+                  name="Statut"
                   defaultQuery={getDefaultQuery}
                   className="dropdown-filter"
                   componentId="STATUS"
@@ -228,12 +231,13 @@ export default () => {
                   title=""
                   URLParams={true}
                   showSearch={false}
-                  renderLabel={(items) => getFilterLabel(items, "Statut")}
+                  renderLabel={(items) => getFilterLabel(items, "Tous")}
                 />
-                <MultiDropdownList
+                <MultiDropdownListComponent
+                  name="Cohorte"
                   defaultQuery={getDefaultQuery}
                   className="dropdown-filter"
-                  placeholder="Cohorte"
+                  placeholder="Toutes"
                   componentId="COHORT"
                   dataField="cohort.keyword"
                   react={{ and: FILTERS.filter((e) => e !== "COHORT") }}
@@ -249,7 +253,8 @@ export default () => {
               <FilterRow visible={filterVisible}>
                 <RegionFilter defaultQuery={getDefaultQuery} filters={FILTERS} />
                 <DepartmentFilter defaultQuery={getDefaultQuery} filters={FILTERS} />
-                <MultiDropdownList
+                <MultiDropdownListComponent
+                  name="Statut phase 1"
                   defaultQuery={getDefaultQuery}
                   className="dropdown-filter"
                   componentId="STATUS_PHASE_1"
@@ -261,9 +266,10 @@ export default () => {
                   title=""
                   URLParams={true}
                   showSearch={false}
-                  renderLabel={(items) => getFilterLabel(items, "Statut phase 1")}
+                  renderLabel={(items) => getFilterLabel(items, "Tous")}
                 />
-                <MultiDropdownList
+                <MultiDropdownListComponent
+                  name="Participations au séjour de cohésion"
                   defaultQuery={getDefaultQuery}
                   className="dropdown-filter"
                   componentId="COHESION_PRESENCE"
@@ -275,9 +281,10 @@ export default () => {
                   title=""
                   URLParams={true}
                   showSearch={false}
-                  renderLabel={(items) => getFilterLabel(items, "Participations au séjour de cohésion")}
+                  renderLabel={(items) => getFilterLabel(items, "Tous")}
                 />
-                <MultiDropdownList
+                <MultiDropdownListComponent
+                  name="Réception fiches sanitaires"
                   defaultQuery={getDefaultQuery}
                   className="dropdown-filter"
                   componentId="MEDICAL_FILE_RECEIVED"
@@ -289,9 +296,10 @@ export default () => {
                   title=""
                   URLParams={true}
                   showSearch={false}
-                  renderLabel={(items) => getFilterLabel(items, "Fiches sanitaires")}
+                  renderLabel={(items) => getFilterLabel(items, "Tous")}
                 />
-                <MultiDropdownList
+                <MultiDropdownListComponent
+                  name="Statut phase 2"
                   defaultQuery={getDefaultQuery}
                   className="dropdown-filter"
                   componentId="STATUS_PHASE_2"
@@ -303,9 +311,10 @@ export default () => {
                   title=""
                   URLParams={true}
                   showSearch={false}
-                  renderLabel={(items) => getFilterLabel(items, "Statut phase 2")}
+                  renderLabel={(items) => getFilterLabel(items, "Tous")}
                 />
-                <MultiDropdownList
+                <MultiDropdownListComponent
+                  name="Statut phase 3"
                   defaultQuery={getDefaultQuery}
                   className="dropdown-filter"
                   componentId="STATUS_PHASE_3"
@@ -317,9 +326,10 @@ export default () => {
                   title=""
                   URLParams={true}
                   showSearch={false}
-                  renderLabel={(items) => getFilterLabel(items, "Statut phase 3")}
+                  renderLabel={(items) => getFilterLabel(items, "Tous")}
                 />
-                <MultiDropdownList
+                <MultiDropdownListComponent
+                  name="Statut mission"
                   defaultQuery={getDefaultQuery}
                   className="dropdown-filter"
                   componentId="APPLICATION_STATUS"
@@ -331,9 +341,10 @@ export default () => {
                   title=""
                   URLParams={true}
                   showSearch={false}
-                  renderLabel={(items) => getFilterLabel(items, "Statut mission")}
+                  renderLabel={(items) => getFilterLabel(items, "Tous")}
                 />
-                <MultiDropdownList
+                <MultiDropdownListComponent
+                  name="Statut contrats"
                   defaultQuery={getDefaultQuery}
                   className="dropdown-filter"
                   componentId="CONTRACT_STATUS"
@@ -347,7 +358,8 @@ export default () => {
                   showSearch={false}
                   renderLabel={(items) => getFilterLabel(items, "Statut contrats")}
                 />
-                <MultiDropdownList
+                <MultiDropdownListComponent
+                  name="Statut documents Préparation Militaire"
                   defaultQuery={getDefaultQuery}
                   className="dropdown-filter"
                   componentId="MILITARY_PREPARATION_FILES_STATUS"
@@ -359,7 +371,7 @@ export default () => {
                   title=""
                   URLParams={true}
                   showSearch={false}
-                  renderLabel={(items) => getFilterLabel(items, "Statut documents Préparation Militaire")}
+                  renderLabel={(items) => getFilterLabel(items, "Tous")}
                 />
                 <Help onClick={toggleInfos} onMouseEnter={() => setInfosHover(true)} onMouseLeave={() => setInfosHover(false)}>
                   {infosClick ? <LockIcon src={LockedSvg} /> : <LockIcon src={UnlockedSvg} />}

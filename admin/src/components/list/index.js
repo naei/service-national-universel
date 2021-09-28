@@ -129,42 +129,6 @@ export const ResultTable = styled.div`
 export const Filter = styled.div`
   padding: 0 25px;
   margin-bottom: 20px;
-  .searchbox {
-    display: block;
-    width: 100%;
-    background-color: #fff;
-    min-width: 20rem;
-    box-shadow: 0px 2px 4px rgba(0, 0, 0, 0.05);
-    color: #767676;
-    border: 0;
-    outline: 0;
-    padding: 15px 20px;
-    border-radius: 6px;
-    margin-right: 15px;
-    margin-bottom: 15px;
-    ::placeholder {
-      color: #767676;
-    }
-  }
-  .dropdown-filter {
-    button {
-      height: 2.5rem;
-      background-color: #fff;
-      box-shadow: 0px 2px 4px rgba(0, 0, 0, 0.05);
-      border: 0;
-      border-radius: 6px;
-      padding: 10px 20px;
-      font-size: 14px;
-      color: #242526;
-      min-width: 150px;
-      margin-right: 15px;
-      cursor: pointer;
-      div {
-        width: 100%;
-        overflow: visible;
-      }
-    }
-  }
 `;
 
 export const Table = styled.table`
@@ -206,26 +170,6 @@ export const FilterRow = styled.div`
   ${({ visible }) => (!visible ? "display: none;" : "display: flex;")}
   align-items: flex-start;
   flex-wrap: wrap;
-  .dropdown-filter {
-    margin-right: 15px;
-    margin-bottom: 15px;
-  }
-  button {
-    background-color: #fff;
-    box-shadow: 0px 2px 4px rgba(0, 0, 0, 0.05);
-    border: 0;
-    border-radius: 6px;
-    padding: 10px 20px;
-    font-size: 14px;
-    color: #242526;
-    min-width: 150px;
-    margin-right: 15px;
-    cursor: pointer;
-    div {
-      width: 100%;
-      overflow: visible;
-    }
-  }
 `;
 
 export const ResultStats = styled.div`

@@ -1,11 +1,12 @@
 import React from "react";
-import { MultiDropdownList } from "@appbaseio/reactivesearch";
+import MultiDropdownListComponent from "../list/MultiDropdownListComponent";
 
 export const RegionFilter = ({ defaultQuery, filters, dataField = "region.keyword", ...rest }) => (
-  <MultiDropdownList
+  <MultiDropdownListComponent
+    name="Région"
     defaultQuery={defaultQuery}
     className="dropdown-filter"
-    placeholder="Régions"
+    placeholder="Toutes"
     componentId="REGION"
     dataField={dataField}
     title=""
