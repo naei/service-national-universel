@@ -1,9 +1,8 @@
 import React, { useEffect, useState } from "react";
 import styled from "styled-components";
 import { useSelector } from "react-redux";
-
 import Loader from "../../../components/Loader";
-import { formatStringDate, ROLES, ticketStateIdByName, ticketStateNameById } from "../../../utils";
+import { formatStringDate, ticketStateIdByName, ticketStateNameById } from "../../../utils";
 import MailCloseIcon from "../../../components/MailCloseIcon";
 import MailOpenIcon from "../../../components/MailOpenIcon";
 import SuccessIcon from "../../../components/SuccessIcon";
@@ -12,8 +11,9 @@ import api from "../../../services/api";
 
 export default ({ setTicket, selectedTicket }) => {
   const [stateFilter, setStateFilter] = useState();
-  const [tickets, setTickets] = useState(null);
-  const user = useSelector((state) => state.Auth.user);
+  const fetchedTickets = useSelector((state) => state.Tickets.tickets);
+  const [tickets, setTickets] = useState(fetchedTickets);
+  const tags = useSelector((state) => state.Tickets.tags);
 
   const getTickets = async (tags) => {
     const { data } = await api.post(`/support-center/ticket/search-by-tags?withArticles=true`, { tags });
@@ -25,12 +25,15 @@ export default ({ setTicket, selectedTicket }) => {
   };
 
   useEffect(() => {
-    let tags = [];
-    if (user.role === ROLES.ADMIN) tags.push(["AGENT_Startup_Support"]);
-    else if (user.role === ROLES.REFERENT_DEPARTMENT) tags.push(["AGENT_Référent_Département", `DEPARTEMENT_${user.department}`]);
-    else if (user.role === ROLES.REFERENT_REGION) tags.push(["AGENT_Référent_Région", `REGION_${user.region}`]);
-    if (tags.length) getTickets(tags);
-  }, []);
+    // let tags = [];
+    // if (user.role === ROLES.ADMIN) tags.push(["AGENT_Startup_Support"]);
+    // else if (user.role === ROLES.REFERENT_DEPARTMENT) tags.push(["AGENT_Référent_Département", `DEPARTEMENT_${user.department}`]);
+    // else if (user.role === ROLES.REFERENT_REGION) tags.push(["AGENT_Référent_Région", `REGION_${user.region}`]);
+    console.log("USER TAGS", tags);
+    console.log("FETCHED TICKETS", fetchedTickets);
+    console.log("TICKETS", tickets);
+    //if (tags?.length) getTickets(tags);
+  }, [fetchedTickets]);
 
   useEffect(() => {
     const displayedTickets = tickets?.filter((ticket) => !stateFilter || ticket?.state_id === stateFilter);
@@ -89,14 +92,14 @@ export default ({ setTicket, selectedTicket }) => {
             X
           </TabItem> */}
         </FilterContainer>
-        {!tickets ? (
+        {!fetchedTickets ? (
           <Loader />
         ) : (
           <>
-            {tickets?.filter((ticket) => !stateFilter || ticket?.state_id === stateFilter)?.length === 0 ? (
+            {fetchedTickets?.filter((ticket) => !stateFilter || ticket?.state_id === stateFilter)?.length === 0 ? (
               <div style={{ textAlign: "center", padding: "1rem", fontSize: "0.85rem" }}>Aucun ticket</div>
             ) : null}
-            {tickets
+            {fetchedTickets
               ?.filter((ticket) => !stateFilter || ticket?.state_id === stateFilter)
               ?.sort((a, b) => {
                 return new Date(b.updated_at) - new Date(a.updated_at);

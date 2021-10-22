@@ -1,11 +1,9 @@
 import React, { useState } from "react";
 import styled from "styled-components";
-
 import Header from "./components/header";
 import TicketTabs from "./components/ticketTabs";
 import TicketMessage from "./components/ticketMessage";
 import Infos from "./components/ticketInfos";
-import { environment } from "../../config";
 
 export default () => {
   const [ticket, setTicket] = useState(null);

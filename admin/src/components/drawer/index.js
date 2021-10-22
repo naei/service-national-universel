@@ -172,6 +172,7 @@ const Drawer = (props) => {
   const openedTickets = useSelector((state) => state.Tickets.open);
   const closedTickets = useSelector((state) => state.Tickets.closed);
   const tickets = useSelector((state) => state.Tickets.tickets);
+  const userTags = useSelector((state) => state.Tickets.tags);
   const [open, setOpen] = useState();
   const [environmentBannerVisible, setEnvironmentBannerVisible] = useState(true);
   useEffect(() => {
@@ -188,7 +189,11 @@ const Drawer = (props) => {
       const { data } = await api.post(`/support-center/ticket/search-by-tags?withArticles=true`, { tags });
       props.dispatchTickets(data);
     };
-    if (tags.length) getTickets(tags);
+    if (tags.length) {
+      console.log("TAGS", tags);
+      props.dispatchTags(tags);
+      getTickets(tags);
+    }
   }, []);
 
   const handleClick = () => {
@@ -248,6 +253,16 @@ const mapDispatchToProps = (dispatch) => ({
         new: totalNewTickets(tickets),
         open: totalOpenedTickets(tickets),
         closed: totalClosedTickets(tickets),
+      }
+    })
+  },
+  dispatchTags: (tags) => {
+    console.log("Is it working ?");
+    console.log("---->", tags);
+    dispatch({
+      type: 'DISPATCH_TAGS',
+      payload: {
+        tags,
       }
     })
   }

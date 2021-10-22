@@ -3,6 +3,7 @@ const initialState = {
   new: 0,
   open: 0,
   closed: 0,
+  tags: null,
 };
 
 const reducer = (oldState = initialState, action) => {
@@ -14,6 +15,11 @@ const reducer = (oldState = initialState, action) => {
         new: action.payload.new,
         open: action.payload.open,
         closed: action.payload.closed,
+      };
+    case 'DISPATCH_TAGS':
+      return {
+        ...oldState,
+        tags: action.payload.tags,
       };
     default:
       return { ...oldState };

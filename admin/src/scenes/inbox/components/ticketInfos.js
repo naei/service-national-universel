@@ -1,20 +1,19 @@
 import React, { useEffect, useState } from "react";
 import { toastr } from "react-redux-toastr";
-import { useSelector } from "react-redux";
-import { NavLink, Link, useHistory } from "react-router-dom";
+import { useSelector, connect } from "react-redux";
+import { Link, useHistory } from "react-router-dom";
 import styled from "styled-components";
-
 import PanelActionButton from "../../../components/buttons/PanelActionButton";
 import api from "../../../services/api";
 import { ticketStateNameById, copyToClipboard, translate, getAge, formatDateFRTimezoneUTC } from "../../../utils";
-import Loader from "../../../components/Loader";
 import { appURL, adminURL } from "../../../config";
+import { totalNewTickets, totalOpenedTickets, totalClosedTickets } from "../../../utils";
 
-export default ({ ticket }) => {
+const TicketInfos = ({ ticket, dispatchTickets }) => {
   const [user, setUser] = useState([]);
   const [tag, setTag] = useState("");
-  const history = useHistory();
   const [referentManagerPhase2, setReferentManagerPhase2] = useState();
+  const userTags = useSelector((state) => state.Tickets.tags);
 
   useEffect(() => {
     (async () => {
@@ -52,7 +51,10 @@ export default ({ ticket }) => {
     });
     if (!response.ok) console.log(response.status, "error");
     if (response.ok) toastr.success("Ticket résolu !");
-    history.go(0);
+    console.log("userTAGS", userTags);
+    const data = await api.post(`/support-center/ticket/search-by-tags?withArticles=true`, { tags: userTags });
+    console.log("DATA", data);
+    if (data.ok) dispatchTickets(data.data);
   };
 
   const renderInfos = () => {
@@ -149,6 +151,24 @@ export default ({ ticket }) => {
     </HeroContainer>
   );
 };
+
+const mapDispatchToProps = (dispatch) => ({
+  dispatchTickets: (tickets) => {
+    dispatch({
+      type: 'FETCH_TICKETS',
+      payload: {
+        tickets,
+        new: totalNewTickets(tickets),
+        open: totalOpenedTickets(tickets),
+        closed: totalClosedTickets(tickets),
+      }
+    })
+  }
+})
+
+let container = connect(null, mapDispatchToProps)(TicketInfos);
+
+export default container;
 
 const Item = ({ title, content, copy = false }) => {
   if (!content) return null;
