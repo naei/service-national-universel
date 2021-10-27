@@ -77,6 +77,36 @@ export default () => {
         {({ values, handleChange, handleSubmit, errors, touched }) => (
           <>
             <FormRow>
+              <Col md={4} className="gender-form">
+                <Label>Genre</Label>
+                <RadioLabel>
+                  <Field
+                    validate={(v) => !v && requiredMessage}
+                    className="form-control"
+                    type="radio"
+                    name="gender"
+                    value="female"
+                    checked={values.gender === "female"}
+                    onChange={handleChange}
+                  />
+                  Femme
+                </RadioLabel>
+                <RadioLabel>
+                  <Field
+                    validate={(v) => !v && requiredMessage}
+                    className="form-control"
+                    type="radio"
+                    name="gender"
+                    value="male"
+                    checked={values.gender === "male"}
+                    onChange={handleChange}
+                  />
+                  Homme
+                </RadioLabel>
+                <ErrorMessage errors={errors} touched={touched} name="gender" />
+              </Col>
+            </FormRow>
+            {/* <FormRow>
               <Col md={4}>
                 <Label>
                   Pièce d'identité
@@ -113,12 +143,10 @@ export default () => {
                 <div style={{ fontSize: "0.8rem", color: "#555", fontStyle: "italic" }}>* Carte nationale d'identité RECTO-VERSO ou passeport</div>
                 <ErrorMessage errors={errors} touched={touched} name="cniFiles" />
               </Col>
-            </FormRow>
+            </FormRow> */}
             <FormRow align="center">
               <Col md={4}>
                 <Label>Votre téléphone</Label>
-              </Col>
-              <Col>
                 <Field
                   placeholder="Téléphone"
                   className="form-control"
@@ -131,38 +159,6 @@ export default () => {
                   onChange={handleChange}
                 />
                 <ErrorMessage errors={errors} touched={touched} name="phone" />
-              </Col>
-            </FormRow>
-            <FormRow>
-              <Col md={4}>
-                <Label>Sexe</Label>
-              </Col>
-              <Col>
-                <RadioLabel>
-                  <Field
-                    validate={(v) => !v && requiredMessage}
-                    className="form-control"
-                    type="radio"
-                    name="gender"
-                    value="female"
-                    checked={values.gender === "female"}
-                    onChange={handleChange}
-                  />
-                  Femme
-                </RadioLabel>
-                <RadioLabel>
-                  <Field
-                    validate={(v) => !v && requiredMessage}
-                    className="form-control"
-                    type="radio"
-                    name="gender"
-                    value="male"
-                    checked={values.gender === "male"}
-                    onChange={handleChange}
-                  />
-                  Homme
-                </RadioLabel>
-                <ErrorMessage errors={errors} touched={touched} name="gender" />
               </Col>
             </FormRow>
             <FormRow>
@@ -259,11 +255,11 @@ export default () => {
                   YOUNG_SITUATIONS.SPECIALIZED_SCHOOL,
                   YOUNG_SITUATIONS.APPRENTICESHIP,
                 ].includes(values.situation) && (
-                  <div style={{ marginBottom: "10px" }}>
-                    <RadioLabel style={{ fontWeight: "bold" }}>Trouver votre établissement</RadioLabel>
-                    <Etablissement values={values} handleChange={handleChange} />
-                  </div>
-                )}
+                    <div style={{ marginBottom: "10px" }}>
+                      <RadioLabel style={{ fontWeight: "bold" }}>Trouver votre établissement</RadioLabel>
+                      <Etablissement values={values} handleChange={handleChange} />
+                    </div>
+                  )}
                 <RadioLabel style={{ fontWeight: "bold" }}>Je suis en emploi :</RadioLabel>
                 <div style={{ marginLeft: "1rem" }}>
                   <RadioLabel>
@@ -397,6 +393,10 @@ export default () => {
 
 const Wrapper = styled.div`
   padding: 40px;
+  .gender-form {
+    display: flex;
+    justify-content: space-between;
+  }
   @media (max-width: 768px) {
     padding: 22px;
   }
