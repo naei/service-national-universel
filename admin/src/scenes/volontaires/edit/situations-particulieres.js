@@ -36,6 +36,16 @@ export default ({ values, handleChange, handleSubmit }) => (
           ]}
         />
         <Select
+          name="allergies"
+          values={values}
+          handleChange={handleChange}
+          title="Allergies"
+          options={[
+            { value: "true", label: "Oui" },
+            { value: "false", label: "Non" },
+          ]}
+        />
+        <Select
           name="ppsBeneficiary"
           values={values}
           handleChange={handleChange}
@@ -72,6 +82,28 @@ export default ({ values, handleChange, handleSubmit }) => (
           values={values}
           name="specificAmenagmentType"
           handleChange={handleChange}
+        />
+        <Select
+          disabled={values.handicap !== "true"}
+          name="reducedMobilityAccess"
+          values={values}
+          handleChange={handleChange}
+          title="Aménagement pour mobilité réduite"
+          options={[
+            { value: "true", label: "Oui" },
+            { value: "false", label: "Non" },
+          ]}
+        />
+        <Select
+          disabled={values.handicap !== "true"}
+          name="handicapInSameDepartment"
+          values={values}
+          handleChange={handleChange}
+          title="Doit être affecté dans son département"
+          options={[
+            { value: "true", label: "Oui" },
+            { value: "false", label: "Non" },
+          ]}
         />
         <Select
           disabled={values.ppsBeneficiary !== "true" && values.handicap !== "true"}
