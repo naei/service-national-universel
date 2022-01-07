@@ -14,6 +14,8 @@ import ModalWithdrawn from "./modals/ModalWithdrawn";
 import Chevron from "./Chevron";
 import ModalConfirm from "./modals/ModalConfirm";
 import ModalConfirmMultiAction from "./modals/ModalConfirmMultiAction";
+import ElementWithTootip from "./Tooltip";
+import InfoIcon from "../assets/InfoIcon";
 
 export default function SelectStatus({ hit, options = Object.keys(YOUNG_STATUS), statusName = "status", phase = YOUNG_PHASE.INSCRIPTION, disabled, callback = () => {} }) {
   const [modal, setModal] = useState(null);
@@ -133,6 +135,23 @@ export default function SelectStatus({ hit, options = Object.keys(YOUNG_STATUS),
     }
   };
 
+  const getTooltipContent = (s) => {
+    switch (s) {
+      case YOUNG_STATUS.WAITING_LIST:
+        return "Ce profil est en liste complémentaire";
+      case YOUNG_STATUS.REFUSED:
+        return "Ce profil a été refusé";
+      case YOUNG_STATUS.WITHDRAWN:
+        return "Ce profil a été retiré";
+      case YOUNG_STATUS.WAITING_CORRECTION:
+        return "Ce profil est en attente de correction";
+      case YOUNG_STATUS.VALIDATED:
+        return "Ce profil a été validé";
+      default:
+        return "";
+    }
+  };
+
   return (
     <>
       <ModalConfirm
@@ -210,7 +229,12 @@ export default function SelectStatus({ hit, options = Object.keys(YOUNG_STATUS),
               .map((status) => {
                 return (
                   <DropdownItem key={status} className="dropdown-item" onClick={() => handleClickStatus(status)}>
-                    {translate(status)}
+                    <div>{translate(status)}</div>
+                    {getTooltipContent(status) ? (
+                      <ElementWithTootip tooltipContent={getTooltipContent(status)}>
+                        <InfoIcon color={colors.purple} />
+                      </ElementWithTootip>
+                    ) : null}
                   </DropdownItem>
                 );
               })}
