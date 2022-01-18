@@ -18,6 +18,7 @@ export default function EtablissmentInput({ handleChange, values, keys, errors, 
       for (let i = 0; inputElements[i]; i++) inputElements[i].setAttribute("autocomplete", "novalue");
     }
     if (!values[keys.schoolCountry]) setFieldValue(keys.schoolCountry, "France");
+    console.log("VALUES", values);
   }, []);
 
   return (
@@ -35,6 +36,7 @@ export default function EtablissmentInput({ handleChange, values, keys, errors, 
             handleChange(e);
             setFieldValue(keys.schoolName, "");
             setFieldValue(keys.schoolCity, "");
+            setFieldValue(keys.schoolZip, "");
             setFieldValue(keys.schoolId, "");
           }}>
           {Object.values(countriesList)
@@ -54,7 +56,9 @@ export default function EtablissmentInput({ handleChange, values, keys, errors, 
             <SchoolCityTypeahead
               initialValue={values[keys.schoolCity] || ""}
               onChange={(text) => {
+                console.log("CITY", text);
                 setFieldValue(keys.schoolCity, text);
+                setFieldValue(keys.schoolZip, "");
                 setFieldValue(keys.schoolName, "");
                 setFieldValue(keys.schoolId, "");
               }}
@@ -68,8 +72,10 @@ export default function EtablissmentInput({ handleChange, values, keys, errors, 
           initialValue={values[keys.schoolName] || ""}
           country={values[keys.schoolCountry]}
           city={values[keys.schoolCity]}
+          zip={values[keys.schoolZip]}
           disabled={values[keys.schoolCountry] === "France" && !values[keys.schoolCity]}
           onChange={({ name, id }) => {
+            console.log("NAME", name, id);
             setFieldValue(keys.schoolName, name);
             setFieldValue(keys.schoolId, id);
           }}
@@ -114,9 +120,11 @@ export default function EtablissmentInput({ handleChange, values, keys, errors, 
 function SchoolCityTypeahead({ onChange, initialValue }) {
   const [suggestions, setSuggestions] = useState([]);
   const [value, setValue] = useState("");
+  const [zip, setZip] = useState("");
 
   useEffect(() => {
     setValue(initialValue);
+    console.log("SUGGESTIONS", suggestions);
   }, [initialValue]);
 
   return (
@@ -154,7 +162,9 @@ function SchoolCityTypeahead({ onChange, initialValue }) {
           placeholder: "Indiquez un nom de ville",
           value,
           onChange: (event, { newValue }) => {
+            console.log("NEW VALUE", event.target.value);
             setValue(newValue);
+            setZip(newValue);
             onChange(newValue);
           },
           className: "form-control",
@@ -192,6 +202,7 @@ function SchoolNameTypeahead({ onChange, country, city, initialValue, disabled =
             },
             size: 100,
           });
+          console.log("SUGGEST", responses[0]?.hits?.hits);
 
           const hitsFormatted = responses[0]?.hits?.hits.map((e) => ({ _id: e._id, ...e._source })).sort((a, b) => a.fullName.localeCompare(b.fullName));
           setSuggestions(hitsFormatted);
