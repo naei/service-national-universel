@@ -75,6 +75,7 @@ router.put("/:supportUserId", passport.authenticate("support-user", { session: f
     if (req.body.hasOwnProperty("registerdAt")) updatedUser.registerdAt = req.body.registerdAt;
     if (req.body.hasOwnProperty("role")) updatedUser.role = req.body.role;
     if (req.body.hasOwnProperty("filters")) updatedUser.filters = req.body.filters;
+    if (req.body.hasOwnProperty("ticketsColumnLayout")) updatedUser.ticketsColumnLayout = req.body.ticketsColumnLayout;
 
     user.set(updatedUser);
     await user.save();

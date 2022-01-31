@@ -124,6 +124,11 @@ const Schema = new mongoose.Schema(
       },
     },
     folders: [folderSchema],
+    ticketsColumnLayout: {
+      type: String,
+      default:
+        "number,title,category,subject,canal,group,priority,status,emitterExternal,emitterDepartment,emitterRegion,emitterAcademy,addressedToAgent,firstResponseAt,timeUntilFirstResponse,lastContactEmitterAt,lastContactAgentAt,agentResponseCount,lastAgentInChargeUpdateAt,tags,closedAt,createdAt",
+    },
   },
   { timestamps: true },
 );
