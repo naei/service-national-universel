@@ -37,7 +37,7 @@ module.exports = {
       },
       colors: {
         "snu-purple-900": "#32257F",
-        "snu-purple-800": "#3830a9",
+        "snu-purple-800": "#382F79",
         "snu-purple-600": "#43389b",
         "snu-purple-300": "#5145cc",
         "snu-purple-200": "#4F46E5",

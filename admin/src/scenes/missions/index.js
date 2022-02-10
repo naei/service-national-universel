@@ -1,5 +1,5 @@
 import React from "react";
-import { Switch, Route } from "react-router-dom";
+import { Switch, Route, Routes } from "react-router-dom";
 
 import List from "./list";
 import Edit from "./edit";
@@ -7,12 +7,12 @@ import View from "./view";
 
 export default function Index() {
   return (
-    <Switch>
-      <Route path="/mission/create/:structureId" component={Edit} />
-      <Route path="/mission/create" component={Edit} />
-      <Route path="/mission/:id/edit" component={Edit} />
-      <Route path="/mission/:id" component={View} />
-      <Route path="/mission" component={List} />
-    </Switch>
+    <Routes>
+      <Route path="/mission/create/:structureId" element={<Edit />} />
+      <Route path="/mission/create" element={<Edit />} />
+      <Route path="/mission/:id/edit" element={<Edit />} />
+      <Route path="/mission/:id" element={<View />} />
+      <Route path="/mission" element={<List />} />
+    </Routes>
   );
 }
