@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from "react";
 import { useSelector, useDispatch } from "react-redux";
-import { BrowserRouter as Router, Route, Switch, Redirect } from "react-router-dom";
+import { BrowserRouter as Router, Route, Routes, Switch, Redirect } from "react-router-dom";
 import "bootstrap/dist/css/bootstrap.min.css";
 import * as Sentry from "@sentry/react";
 import { Integrations } from "@sentry/tracing";
@@ -83,13 +83,13 @@ export default function App() {
     <Router>
       <Zammad />
       <div className="main">
-        <Switch>
-          <Route path="/validate" component={Validate} />
-          <Route path="/conditions-generales-utilisation" component={CGU} />
-          <Route path="/auth" component={Auth} />
-          <Route path="/public-besoin-d-aide" component={PublicSupport} />
-          <Route path="/" component={Home} />
-        </Switch>
+        <Routes>
+          <Route path="/validate" element={<Validate />} />
+          <Route path="/conditions-generales-utilisation" element={<CGU />}/>
+          <Route path="/auth" element={<Auth />} />
+          <Route path="/public-besoin-d-aide" element={<PublicSupport />} />
+          <Route path="/" element={<Home />} />
+        </Routes>
         <Footer />
       </div>
     </Router>
@@ -146,26 +146,26 @@ const Home = () => {
             setMenuVisible(!menuVisible);
           }}
         />
-        <Switch>
-          <Route path="/auth" component={Auth} />
-          <RestrictedRoute path="/structure" component={Structure} />
-          <RestrictedRoute path="/settings" component={Settings} />
-          <RestrictedRoute path="/profil" component={Profil} />
-          <RestrictedRoute path="/volontaire" component={renderVolontaire} />
-          <RestrictedRoute path="/mission" component={Missions} />
-          <RestrictedRoute path="/inscription" component={Inscription} />
-          <RestrictedRoute path="/user" component={Utilisateur} />
-          <RestrictedRoute path="/contenu" component={Content} />
-          <RestrictedRoute path="/objectifs" component={Goal} roles={[ROLES.ADMIN]} />
-          <RestrictedRoute path="/centre" component={Center} />
-          <RestrictedRoute path="/point-de-rassemblement" component={MeetingPoint} />
-          <RestrictedRoute path="/association" component={Association} />
-          <RestrictedRoute path="/besoin-d-aide" component={SupportCenter} />
-          <RestrictedRoute path="/boite-de-reception" component={Inbox} />
-          <RestrictedRoute path="/dashboard/:currentTab/:currentSubtab" component={renderDashboard} />
-          <RestrictedRoute path="/dashboard/:currentTab" component={renderDashboard} />
-          <RestrictedRoute path="/" component={renderDashboard} />
-        </Switch>
+        <Routes>
+          <Route path="/auth" element={<Auth />} />
+          <Route path="/structure" element={<Structure />} />
+          <Route path="/settings" element={<Settings />} />
+          <Route path="/profil" element={<Profil />} />
+          <Route path="/volontaire" element={<renderVolontaire />} />
+          <Route path="/mission" element={<Missions />} />
+          <Route path="/inscription" element={<Inscription />} />
+          <Route path="/user" element={<Utilisateur />} />
+          <Route path="/contenu" element={<Content />} />
+          <Route path="/objectifs" element={<Goal />} roles={[ROLES.ADMIN]} />
+          <Route path="/centre" element={<Center />} />
+          <Route path="/point-de-rassemblement" element={<MeetingPoint />} />
+          <Route path="/association" element={<Association />} />
+          <Route path="/besoin-d-aide" element={<SupportCenter />} />
+          <Route path="/boite-de-reception" element={<Inbox />} />
+          <Route path="/dashboard/:currentTab/:currentSubtab" element={<renderDashboard />} />
+          <Route path="/dashboard/:currentTab" element={<renderDashboard />} />
+          <Route path="/" element={<renderDashboard />} />
+        </Routes>
       </ContentContainer>
       <ModalCGU
         isOpen={modal?.isOpen}
@@ -184,7 +184,7 @@ const Home = () => {
   );
 };
 
-const RestrictedRoute = ({ component: Component, roles = ROLES_LIST, ...rest }) => {
+const RestrictedRoute = ({ element: element, roles = ROLES_LIST, ...rest }) => {
   const user = useSelector((state) => state.Auth.user);
   if (!user) {
     const redirect = encodeURIComponent(window.location.href.replace(window.location.origin, "").substring(1));
@@ -193,7 +193,7 @@ const RestrictedRoute = ({ component: Component, roles = ROLES_LIST, ...rest }) 
   if (!roles.includes(user.role)) {
     return <Redirect to="/dashboard" />;
   }
-  return <Route {...rest} render={(props) => <Component {...props} />} />;
+  return <Route {...rest} render={(props) => <element {...props} />} />;
 };
 
 const ContentContainer = styled.div`
