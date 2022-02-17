@@ -1,0 +1,17 @@
+{
+  "name": "support-api",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "engines": {
+    "node": "^16.10",
+    "npm": "^8.0",
+    "yarn": "🍎 This project uses NPM, please do not use YARN. 🍎"
+  },
+  "scripts": {
+    "dev": "nodemon ./src/index.js",
+    "start": "node ./src/index.js"
+  },
+  "author": "SELEGO",
+  "license": "MIT"
+}
