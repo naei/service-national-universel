@@ -35,9 +35,20 @@ function checkStatusContract(contract) {
 
 async function updateYoungStatusPhase2Contract(young, fromUser) {
   const contracts = await ContractObject.find({ youngId: young._id });
-  young.set({
-    statusPhase2Contract: contracts.map((contract) => checkStatusContract(contract)),
-  });
+  let applications = [];
+  for (let contract of contracts) {
+    let application = await ApplicationObject.findById(contract.applicationId);
+    if (!application) continue;
+    applications.push(application);
+  }
+  // Faire une whitelist status : "VALIDATED", "DONE"
+  for (let appli of applications) {
+    if (appli.status === "VALIDATED" || appli.status === "DONE") {
+      young.set({
+        statusPhase2Contract: contracts.map((contract) => checkStatusContract(contract)),
+      });
+    }
+  }
 
   await young.save({ fromUser });
 }
