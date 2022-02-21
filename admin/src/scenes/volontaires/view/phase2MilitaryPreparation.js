@@ -4,7 +4,7 @@ import styled from "styled-components";
 import { useHistory } from "react-router-dom";
 import { toastr } from "react-redux-toastr";
 
-import { translate, APPLICATION_STATUS_COLORS, SENDINBLUE_TEMPLATES } from "../../../utils";
+import { translate, APPLICATION_STATUS, APPLICATION_STATUS_COLORS, SENDINBLUE_TEMPLATES } from "../../../utils";
 import Badge from "../../../components/Badge";
 import { Box, BoxTitle, Separator } from "../../../components/box";
 import DownloadButton from "../../../components/buttons/DownloadButton";
@@ -51,6 +51,7 @@ export default function Phase2militaryPrepartion({ young }) {
       // change status of applications
       for (let i = 0; i < applicationsToMilitaryPreparation.length; i++) {
         const app = applicationsToMilitaryPreparation[i];
+        if (app.status !== "WAITING_VERIFICATION") continue;
         const responseApplication = await api.put("/application", { _id: app._id, status: "WAITING_VALIDATION" });
         if (!responseApplication.ok)
           toastr.error(
