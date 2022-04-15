@@ -33,17 +33,18 @@ export default function TicketCreate() {
             try {
               const { message, step1, step2 } = values;
               const title = `${step1?.label} - ${step2?.label}`;
-              const { data, ok, code } = await api.post("/zammad-support-center/ticket", {
-                title,
-                message,
-                // eslint-disable-next-line no-unsafe-optional-chaining
-                tags: [...new Set([...tags, ...(step1?.tags || []), ...(step2?.tags || [])])], // we use this dirty hack to remove duplicates
-              });
-              if (!ok) return toastr.error("Une erreur s'est produite lors de la création de ce ticket :", translate(code));
+              // const { data, ok, code } = await api.post("/zammad-support-center/ticket", {
+              //   title,
+              //   message,
+              //   // eslint-disable-next-line no-unsafe-optional-chaining
+              //   tags: [...new Set([...tags, ...(step1?.tags || []), ...(step2?.tags || [])])], // we use this dirty hack to remove duplicates
+              // });
+              // if (!ok) return toastr.error("Une erreur s'est produite lors de la création de ce ticket :", translate(code));
               const response = await api.post("/zammood/ticket", {
                 message,
                 subject: title,
-                clientId: data.id,
+                clientId: 10004,
+                tags: [...(step1?.tagsZammood || []), ...(step2?.tagsZammood || [])], // we use this dirty hack to remove duplicates
               });
               if (!response.ok) return toastr.error("Une erreur s'est produite lors de la création de ce ticket :", translate(response.code));
               toastr.success("Demande envoyée");

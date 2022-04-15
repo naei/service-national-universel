@@ -35,6 +35,21 @@ router.get("/ticket/:id", passport.authenticate(["referent", "young"], { session
   }
 });
 
+// Search specific ticket by its fields.
+router.post("/ticket/search", passport.authenticate(["referent"], { session: false, failWithError: true }), async (req, res) => {
+  try {
+    const { ok, data } = await zammood.api(`/v0/ticket/search`, { method: "POST", credentials: "include", body: req.body });
+    if (!ok) return res.status(404).send({ ok: false, code: ERRORS.NOT_FOUND });
+    if (data.length)
+      const messages = await zammood.api(`/v0/message?ticketId=${data[0]._id}`, { method: "GET", credentials: "include" });
+    if (!messages.ok) return res.status(404).send({ ok: false, code: ERRORS.NOT_FOUND });
+    return res.status(200).send({ ok: true, data: messages.data });
+  } catch (error) {
+    capture(error);
+    res.status(500).send({ ok: false, code: ERRORS.SERVER_ERROR, error });
+  }
+});
+
 // Create a new ticket while authenticated
 router.post("/ticket", passport.authenticate(["referent", "young"], { session: false, failWithError: true }), async (req, res) => {
   try {
@@ -42,16 +57,18 @@ router.post("/ticket", passport.authenticate(["referent", "young"], { session: f
       clientId: req.body.clientId,
       subject: req.body.subject,
       message: req.body.message,
+      tags: req.body.tags,
     };
     const { error, value } = Joi.object({
       clientId: Joi.number().required(),
       subject: Joi.string().required(),
       message: Joi.string().required(),
+      tags: Joi.array().items(Joi.string()).required(),
     })
       .unknown()
       .validate(obj);
     if (error) return res.status(400).send({ ok: false, code: ERRORS.INVALID_PARAMS });
-    const { subject, message, clientId } = value;
+    const { subject, message, clientId, tags } = value;
     const structureLink = `${ADMIN_URL}/structure/${req.user.structureId}`;
     const missionsLink = `${ADMIN_URL}/structure/${req.user.structureId}/missions`;
     const centerLink = `${ADMIN_URL}/centre/${req.user.cohesionCenterId}`;
@@ -79,6 +96,7 @@ router.post("/ticket", passport.authenticate(["referent", "young"], { session: f
         source: "PLATFORM",
         clientId,
         attributes: userAttributes,
+        tags,
       }),
     });
     if (!response.ok) return res.status(400).send({ ok: false, code: response });

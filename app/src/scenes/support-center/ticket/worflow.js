@@ -37,11 +37,13 @@ export const step1 = {
     id: "TECHNICAL",
     label: "J'ai un problème technique",
     tags: ["TAG_problème_technique", "AGENT_Startup_Support", "AGENT_Startup_Technique"],
+    tagsZammood: [],
   },
   QUESTION: {
     id: "QUESTION",
     label: "J'ai une question",
     tags: ["TAG_question", "AGENT_Startup_Support", "AGENT_Référent_Département", "AGENT_Référent_Région"],
+    tagsZammood: ["AGENT_Référent_Département", "AGENT_Référent_Région"],
   },
 };
 
@@ -50,11 +52,13 @@ export const step1Public = {
     id: "TECHNICAL",
     label: "J'ai un problème technique",
     tags: ["TAG_problème_technique", "AGENT_Startup_Support", "AGENT_Startup_Technique"],
+    tagsZammood: [],
   },
   QUESTION: {
     id: "QUESTION",
     label: "J'ai une question",
     tags: ["TAG_question", "AGENT_Startup_Support"],
+    tagsZammood: ["AGENT_Référent_Département", "AGENT_Référent_Région"],
   },
 };
 
@@ -64,24 +68,28 @@ export const step2Technical = {
     id: "DOWNLOAD",
     label: "Je n'arrive pas à télécharger un document depuis la plateforme",
     tags: ["TAG_téléchargment"],
+    tagsZammood: [],
   },
   UPLOAD: {
     parentId: "TECHNICAL",
     id: "UPLOAD",
     label: "Je n'arrive pas à téléverser (déposer) un document",
     tags: ["TAG_téléversement"],
+    tagsZammood: [],
   },
   CONTRACT: {
     parentId: "TECHNICAL",
     id: "CONTRACT",
     label: "Je n'ai pas reçu le lien de validation du contrat d'engagement",
     tags: ["TAG_contrat_engagement"],
+    tagsZammood: [],
   },
   OTHER: {
     parentId: "TECHNICAL",
     id: "OTHER",
     label: "J'ai un autre problème",
     tags: ["TAG_autre"],
+    tagsZammood: [],
   },
 };
 export const step2Question = {
@@ -90,24 +98,28 @@ export const step2Question = {
     id: "PHASE_1",
     label: "Phase 1 - séjour de cohésion",
     tags: ["TAG_phase_1"],
+    tagsZammood: [],
   },
   PHASE_2: {
     parentId: "QUESTION",
     id: "PHASE_2",
     label: "Phase 2 - Mission d'intérêt général",
     tags: ["TAG_phase_2"],
+    tagsZammood: [],
   },
   PHASE_3: {
     parentId: "QUESTION",
     id: "PHASE_3",
     label: "Phase 3 - L'engagement",
     tags: ["TAG_phase_3"],
+    tagsZammood: [],
   },
   OTHER: {
     parentId: "QUESTION",
     id: "OTHER",
     label: "Autre",
     tags: ["TAG_autre"],
+    tagsZammood: [],
   },
 };
 
@@ -117,24 +129,28 @@ export const step2TechnicalPublic = {
     id: "DOWNLOAD",
     label: "Je n'arrive pas à télécharger un document depuis la plateforme",
     tags: ["TAG_téléchargment"],
+    tagsZammood: [],
   },
   UPLOAD: {
     parentId: "TECHNICAL",
     id: "UPLOAD",
     label: "Je n'arrive pas à téléverser (déposer) un document",
     tags: ["TAG_téléversement"],
+    tagsZammood: [],
   },
   LOGIN: {
     parentId: "TECHNICAL",
     id: "LOGIN",
     label: "Je n'arrive pas à me connecter (Identifiant ou mot de passe incorrect)",
     tags: ["TAG_probleme_connexion"],
+    tagsZammood: [],
   },
   OTHER: {
     parentId: "TECHNICAL",
     id: "OTHER",
     label: "J'ai un autre problème",
     tags: ["TAG_autre"],
+    tagsZammood: [],
   },
 };
 
@@ -144,18 +160,21 @@ export const step2QuestionPublic = {
     id: "PHASE_0",
     label: "Les inscriptions des volontaires",
     tags: ["TAG_phase_0"],
+    tagsZammood: [],
   },
   STRUCTURE: {
     parentId: "QUESTION",
     id: "STRUCTURE",
     label: "L'inscription des structures",
     tags: ["TAG_créer_compte_structure"],
+    tagsZammood: [],
   },
   OTHER: {
     parentId: "QUESTION",
     id: "OTHER",
     label: "Autre",
     tags: ["TAG_autre"],
+    tagsZammood: [],
   },
 };
 

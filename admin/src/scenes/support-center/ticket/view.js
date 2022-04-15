@@ -34,6 +34,18 @@ export default function View(props) {
     };
   }, []);
 
+  //get ticket for referents of youngs of your department / region
+  const fetchZammoodTickets = async () => {
+    try {
+      const roleTag = user.role === "REFERENT_REGION" ? "AGENT_Référent_Région" : "AGENT_Référent_Département";
+      let body = { tags: [roleTag] };
+      user.role === "REFERENT_REGION" ? body.region = user.region : body.department = user.department;
+      const response = await api.post("/zammood/ticket/search", body);
+    } catch (error) {
+      console.log(error);
+    }
+  };
+
   const load = async () => {
     try {
       const id = props.match?.params?.id;
