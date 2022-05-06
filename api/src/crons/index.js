@@ -8,6 +8,7 @@ const computeGoalsInscription = require("./computeGoalsInscription");
 const noticePushMission = require("./noticePushMission");
 //const missionEnd = require("./missionEnd");
 const applicationPending = require("./applicationPending");
+const migProposalReminder = require("./migProposalReminder");
 //const newMissionReminder = require("./newMissionReminder");
 const syncYoungStatsMetabase = require("./syncYoungStatsMetabase");
 const jeVeuxAiderDaily = require("./JeVeuxAiderDaily");
@@ -38,6 +39,9 @@ if (ENVIRONMENT === "production" && process.env.INSTANCE_NUMBER === "0") {
 
   cron.schedule("0 9 * * 1", function () {
     applicationPending.handler();
+  });
+  cron.schedule("0 9 * * 1", function () {
+    migProposalReminder.handler();
   });
 
   // cron.schedule("0 9 * * 1", function () {

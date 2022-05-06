@@ -229,6 +229,7 @@ router.post("/:id/notify/:template", passport.authenticate(["referent", "young"]
     if (!referent) return res.status(404).send({ ok: false, code: ERRORS.NOT_FOUND });
     const young = await YoungObject.findById(application.youngId);
     if (!young) return res.status(404).send({ ok: false, code: ERRORS.NOT_FOUND });
+    const structure = await StructureObject.findById(application.structureId);
 
     if (isYoung(req.user) && req.user._id.toString() !== application.youngId) {
       return res.status(403).send({ ok: false, code: ERRORS.OPERATION_UNAUTHORIZED });
@@ -268,6 +269,9 @@ router.post("/:id/notify/:template", passport.authenticate(["referent", "young"]
     } else if (template === SENDINBLUE_TEMPLATES.young.VALIDATE_APPLICATION) {
       emailTo = [{ name: `${application.youngFirstName} ${application.youngLastName}`, email: application.youngEmail }];
       params = { ...params, cta: `${APP_URL}/candidature` };
+    } else if (template === SENDINBLUE_TEMPLATES.referent.FOLLOW_CONTRACT) {
+      emailTo = [{ name: `${referent.firstName} ${referent.lastName}`, email: referent.email }];
+      params = { ...params, structureName: structure?.name, cta: `${ADMIN_URL}/volontaire/${application.youngId}` };
     } else if (template === SENDINBLUE_TEMPLATES.referent.VALIDATE_APPLICATION_TUTOR) {
       emailTo = [{ name: `${referent.firstName} ${referent.lastName}`, email: referent.email }];
       params = { ...params, cta: `${ADMIN_URL}/volontaire/${application.youngId}` };

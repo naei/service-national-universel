@@ -91,6 +91,7 @@ export default function SelectStatusApplication({ hit, options = [], callback })
       if (status === APPLICATION_STATUS.VALIDATED) {
         await api.post(`/application/${data._id}/notify/${SENDINBLUE_TEMPLATES.referent.YOUNG_VALIDATED}`);
         await api.post(`/application/${data._id}/notify/${SENDINBLUE_TEMPLATES.young.VALIDATE_APPLICATION}`);
+        await api.post(`/application/${data._id}/notify/${SENDINBLUE_TEMPLATES.referent.FOLLOW_CONTRACT}`);
       } else if (status === APPLICATION_STATUS.CANCEL) {
         await api.post(`/application/${data._id}/notify/${SENDINBLUE_TEMPLATES.referent.CANCEL_APPLICATION}`, { message });
       } else if (status === APPLICATION_STATUS.REFUSED) {
