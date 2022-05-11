@@ -8,6 +8,7 @@ const { capture } = require("../sentry");
 const Application = require("../models/application");
 const Contract = require("../models/contract");
 const Referent = require("../models/referent");
+const esClient = require("../es");
 const Structure = require("../models/structure");
 const { sendTemplate } = require("../sendinblue");
 const slack = require("../slack");
@@ -34,22 +35,68 @@ exports.handler = async () => {
       if (!application.structureId) return;
       const structure = await Structure.findById(application.structureId);
       if (!structure) return;
-      const structureResponsible = await Referent.findById(structure.responsible);
+      // const header = { index, type: "_doc" };
+      // return fetch(`${apiURL}/es/${index}/_msearch`, {
+      //   retries: 3,
+      //   retryDelay: 1000,
+      //   retryOn: [502, 503, 504],
+      //   mode: "cors",
+      //   method: "POST",
+      //   redirect: "follow",
+      //   referrer: "no-referrer",
+      //   headers: { "Content-Type": "application/x-ndjson", Authorization: `JWT ${this.token}` },
+      //   body: [header, body].map((e) => `${JSON.stringify(e)}\n`).join(""),
+      // })
+      //   .then((r) => jsonOrRedirectToSignIn(r))
+      //   .catch((e) => {
+      //     Sentry.captureMessage("Error caught in esQuery");
+      //     Sentry.captureException(e);
+      //     console.error(e);
+      //     return { responses: [] };
+      //   });
+      // -----------------------------------------
+      // const { responses: referentResponses } = await api.esQuery("referent", {
+      //   query: { bool: { must: { match_all: {} }, filter: [{ term: { "structureId.keyword": structure._id } }] } },
+      //   size: ES_NO_LIMIT,
+      // });
+      const responsibles = esClient
+        .msearch({
+          index: "referent",
+          body: {
+            query: { bool: { must: { match_all: {} }, filter: [{ term: { "structureId.keyword": structure._id } }] } },
+          },
+        })[0]
+        ?.hits?.hits.map((e) => ({ _id: e._id, ...e._source }));
       if (differenceInDays(now, patches[0].date) >= 7) {
-        // send a mail to the tutor
+        // send a mail to the referents
         countHit++;
         countApplicationMonth[getMonth(new Date(patches[0].date)) + 1] = (countApplicationMonth[getMonth(new Date(patches[0].date)) + 1] || 0) + 1;
-        if (!tutors.includes(tutor.email)) tutors.push(tutor.email);
+        if (responsibles.length > 1) {
+          responsibles.map((r) => {
+            if (!tutors.includes(r.email)) tutors.push(r.email);
 
-        sendTemplate(SENDINBLUE_TEMPLATES.referent.APPLICATION_REMINDER, {
-          emailTo: [{ name: `${tutor.firstName} ${tutor.lastName}`, email: tutor.email }],
-          params: {
-            cta: `${ADMIN_URL}/volontaire/${application.youngId}`,
-            youngFirstName: application.youngFirstName,
-            youngLastName: application.youngLastName,
-            missionName: application.missionName,
-          },
-        });
+            sendTemplate(SENDINBLUE_TEMPLATES.referent.APPLICATION_REMINDER, {
+              emailTo: [{ name: `${r.firstName} ${r.lastName}`, email: r.email }],
+              params: {
+                cta: `${ADMIN_URL}/volontaire/${application.youngId}`,
+                youngFirstName: application.youngFirstName,
+                youngLastName: application.youngLastName,
+                missionName: application.missionName,
+              },
+            });
+          });
+        } else {
+          if (!tutors.includes(responsibles.email)) tutors.push(responsibles.email);
+          sendTemplate(SENDINBLUE_TEMPLATES.referent.APPLICATION_REMINDER, {
+            emailTo: [{ name: `${responsibles.firstName} ${responsibles.lastName}`, email: responsibles.email }],
+            params: {
+              cta: `${ADMIN_URL}/volontaire/${application.youngId}`,
+              youngFirstName: application.youngFirstName,
+              youngLastName: application.youngLastName,
+              missionName: application.missionName,
+            },
+          });
+        }
       }
     });
     slack.info({
