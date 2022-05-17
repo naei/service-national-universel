@@ -5,14 +5,15 @@ import styled from "styled-components";
 import { Formik, Field } from "formik";
 import { useParams } from "react-router";
 
-import { CENTER_ROLES, translate } from "../../../utils";
+import { CENTER_ROLES, translate, SENDINBLUE_TEMPLATES, ROLES } from "../../../utils";
 import { Box } from "../../../components/box";
 import api from "../../../services/api";
 import Trash from "../../../assets/icons/Trash";
 
-export default function Team({ focusedSession: focusedSessionfromProps }) {
+export default function Team({ focusedSession: focusedSessionfromProps, ...props }) {
   const { sessionId } = useParams();
   const [focusedSession, setFocusedSession] = useState(focusedSessionfromProps);
+  const [center, setCenter] = useState();
 
   const addTeamate = async (teamate) => {
     let obj = {};
@@ -38,9 +39,15 @@ export default function Team({ focusedSession: focusedSessionfromProps }) {
       let { data: referent } = await api.get(`/referent?email=${encodeURIComponent(teamate.email)}`);
 
       if (!referent) {
-        // todo : create chef de centre
-        toastr.error("Erreur !", "Aucun utilisateur trouvé avec cette adresse email");
-        return {};
+        const { data: referentCreated } = await api.post(`/referent/signup_invite/${SENDINBLUE_TEMPLATES.invitationReferent[ROLES.HEAD_CENTER]}`, {
+          firstName: teamate.firstName,
+          lastName: teamate.lastName,
+          email: teamate.email,
+          role: ROLES.HEAD_CENTER,
+          cohesionCenterName: center?.name,
+        });
+        toastr.success(`Invitation envoyée à ${teamate.email}`);
+        return { headCenterId: referentCreated._id };
       }
 
       return { headCenterId: referent._id };
@@ -78,6 +85,19 @@ export default function Team({ focusedSession: focusedSessionfromProps }) {
       setFocusedSession(data);
     })();
   }, [sessionId]);
+
+  useEffect(() => {
+    (async () => {
+      const id = props.match && props.match.params && props.match.params.id;
+      if (!id) return;
+
+      const centerResponse = await api.get(`/cohesion-center/${id}`);
+      if (!centerResponse.ok) {
+        return toastr.error("Oups, une erreur est survenue lors de la récupération du centre", translate(centerResponse.code));
+      }
+      setCenter(centerResponse.data);
+    })();
+  }, [props.match.params.id]);
 
   if (!focusedSession) return null;
 
