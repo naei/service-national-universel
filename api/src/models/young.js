@@ -5,6 +5,7 @@ const patchHistory = require("mongoose-patch-history").default;
 const esClient = require("../es");
 const sendinblue = require("../sendinblue");
 const { ENVIRONMENT } = require("../config");
+const File = require("./file");
 
 const MODELNAME = "young";
 
@@ -1434,61 +1435,51 @@ const Schema = new mongoose.Schema({
     enum: ["VALIDATED", "WAITING_VALIDATION", "WAITING_CORRECTION", "REFUSED", "WAITING_UPLOAD"],
   },
 
-  uuids: {
+  files: {
     cniFiles: {
       type: Map,
-      of: String,
+      of: File,
       default: {},
     },
     highSkilledActivityProofFiles: {
       type: Map,
-      of: String,
-      default: {},
+      of: File,
     },
     dataProcessingConsentmentFiles: {
       type: Map,
-      of: String,
-      default: {},
+      of: File,
     },
     parentConsentmentFiles: {
       type: Map,
-      of: String,
-      default: {},
+      of: File,
     },
     imageRightFiles: {
       type: Map,
-      of: String,
-      default: {},
+      of: File,
     },
     autoTestPCRFiles: {
       type: Map,
-      of: String,
-      default: {},
+      of: File,
     },
     rulesFiles: {
       type: Map,
-      of: String,
-      default: {},
+      of: File,
     },
     militaryPreparationFilesIdentity: {
       type: Map,
-      of: String,
-      default: {},
+      of: File,
     },
     militaryPreparationFilesCensus: {
       type: Map,
-      of: String,
-      default: {},
+      of: File,
     },
     militaryPreparationFilesAuthorization: {
       type: Map,
-      of: String,
-      default: {},
+      of: File,
     },
     militaryPreparationFilesCertificate: {
       type: Map,
-      of: String,
-      default: {},
+      of: File,
     },
   },
 
@@ -1586,12 +1577,22 @@ Schema.plugin(patchHistory, {
     modelName: { type: String, required: true, default: MODELNAME },
     user: { type: Object, required: false, from: "_user" },
   },
-  excludes: ["/password", "/lastLoginAt", "/forgotPasswordResetToken", "/forgotPasswordResetExpires", "/invitationToken", "/invitationExpires", "/phase3Token", "/loginAttempts"],
+  excludes: [
+    "/password",
+    "/lastLoginAt",
+    "/forgotPasswordResetToken",
+    "/forgotPasswordResetExpires",
+    "/invitationToken",
+    "/invitationExpires",
+    "/phase3Token",
+    "/loginAttempts",
+    "/uuids",
+  ],
 });
 
 Schema.plugin(
   mongooseElastic(esClient, {
-    ignore: ["historic", "missionsInMail", "password", "forgotPasswordResetToken", "forgotPasswordResetExpires", "invitationExpires", "phase3Token", "loginAttempts"],
+    ignore: ["historic", "missionsInMail", "password", "forgotPasswordResetToken", "forgotPasswordResetExpires", "invitationExpires", "phase3Token", "loginAttempts", "uuids"],
   }),
   MODELNAME,
 );

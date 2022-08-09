@@ -24,7 +24,7 @@ const {
   API_ASSOCIATION_CELLAR_KEYID,
   API_ASSOCIATION_CELLAR_KEYSECRET,
 } = require("../config");
-const { YOUNG_STATUS_PHASE2, SENDINBLUE_TEMPLATES, YOUNG_STATUS, MISSION_STATUS, APPLICATION_STATUS, FILE_STATUS_PHASE1, ROLES, COHESION_STAY_END } = require("snu-lib");
+const { YOUNG_STATUS_PHASE2, SENDINBLUE_TEMPLATES, YOUNG_STATUS, MISSION_STATUS, APPLICATION_STATUS, FILE_STATUS_PHASE1, ROLES } = require("snu-lib");
 
 const { translateFileStatusPhase1 } = require("snu-lib/translation");
 const { getQPV, getDensity } = require("../geo");
@@ -44,12 +44,11 @@ function getReq(url, cb) {
   return http.get(url, cb);
 }
 
-function getUUID(doc, key, filename) {
-  const map = doc.uuids[key];
+function getUUID(record, filecategory, filename) {
+  const map = record.files[filecategory];
   for (let [key, value] of map.entries()) {
-    if (value === filename) return key;
+    if (value.name === filename) return key;
   }
-  return undefined;
 }
 
 function uploadFile(path, file) {

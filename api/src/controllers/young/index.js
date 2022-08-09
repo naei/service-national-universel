@@ -842,6 +842,7 @@ router.put("/:id/soft-delete", passport.authenticate("referent", { session: fals
       "region",
       "zip",
       "city",
+      "uuids",
     ];
 
     for (const key in young._doc) {
@@ -850,11 +851,17 @@ router.put("/:id/soft-delete", passport.authenticate("referent", { session: fals
       }
     }
 
+    // TODO - cleaner delete
     young.set({ location: { lat: undefined, lon: undefined } });
     young.set({ schoolLocation: { lat: undefined, lon: undefined } });
     young.set({ parent1Location: { lat: undefined, lon: undefined } });
     young.set({ parent2Location: { lat: undefined, lon: undefined } });
     young.set({ medicosocialStructureLocation: { lat: undefined, lon: undefined } });
+    for (const key in young.uuids) {
+      young.set({ uuids: { [key]: undefined } });
+    }
+
+    // Data to keep
     young.set({ email: `${young._doc["_id"]}@delete.com` });
     young.set({ status: YOUNG_STATUS.DELETED });
 

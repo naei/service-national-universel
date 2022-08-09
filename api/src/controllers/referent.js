@@ -541,18 +541,18 @@ router.post("/:tutorId/email/:template", passport.authenticate("referent", { ses
 
 // Todo: refactor
 // get /young/:id/file/:key/:filename accessible only by ref or themself
-router.get("/youngFile/:youngId/:key/:fileName", passport.authenticate("referent", { session: false, failWithError: true }), async (req, res) => {
+router.get("/youngFile/:youngId/:key/:fileId", passport.authenticate("referent", { session: false, failWithError: true }), async (req, res) => {
   try {
     const { error, value } = Joi.object({
       youngId: Joi.string().required(),
       key: Joi.string().required(),
-      fileName: Joi.string().required(),
+      fileId: Joi.string().required(),
     })
       .unknown()
       .validate({ ...req.params }, { stripUnknown: true });
     if (error) return res.status(400).send({ ok: false, code: ERRORS.INVALID_PARAMS });
 
-    const { youngId, key, fileName } = value;
+    const { youngId, key, fileId } = value;
 
     const young = await YoungModel.findById(youngId);
 
@@ -595,9 +595,8 @@ router.get("/youngFile/:youngId/:key/:fileName", passport.authenticate("referent
         return res.status(403).send({ ok: false, code: ERRORS.OPERATION_UNAUTHORIZED });
     }
 
-    const uuid = getUUID(young, key, fileName);
-    console.log("UUID:", uuid);
-    const downloaded = await getFile(`app/young/${youngId}/${key}/${uuid || fileName}`);
+    // const uuid = getUUID(young, key, fileName);
+    const downloaded = await getFile(`app/young/${youngId}/${key}/${fileId}`);
     const decryptedBuffer = decrypt(downloaded.Body);
 
     let mimeFromFile = null;
@@ -671,6 +670,7 @@ router.post(
   fileUpload({ limits: { fileSize: 10 * 1024 * 1024 }, useTempFiles: true, tempFileDir: "/tmp/" }),
   async (req, res) => {
     try {
+      // Validation
       const militaryKeys = ["militaryPreparationFilesIdentity", "militaryPreparationFilesCensus", "militaryPreparationFilesAuthorization", "militaryPreparationFilesCertificate"];
       const { error, value } = Joi.object({
         key: Joi.string().required(),
@@ -718,14 +718,18 @@ router.post(
         );
       if (filesError) return res.status(400).send({ ok: false, code: ERRORS.INVALID_PARAMS });
 
-      let uuids = young.uuids[key];
+      if (!young.files[key]) {
+        young.files.set(key, {});
+      }
+
+      console.log("files:", files);
 
       for (let currentFile of files) {
         // If multiple file with same names are provided, currentFile is an array. We just take the latest.
         if (Array.isArray(currentFile)) {
           currentFile = currentFile[currentFile.length - 1];
         }
-        const { name, tempFilePath, mimetype } = currentFile;
+        const { name, tempFilePath, mimetype, size } = currentFile;
         const { mime: mimeFromMagicNumbers } = await FileType.fromFile(tempFilePath);
         const validTypes = ["image/jpeg", "image/png", "application/pdf"];
         if (!(validTypes.includes(mimetype) && validTypes.includes(mimeFromMagicNumbers))) {
@@ -744,31 +748,30 @@ router.post(
           }
         }
 
-        // Check if file is new
-        if (!young[key].includes(name)) {
-          // If so, generate uuid and save it with file name in db
-          const uuid = crypto.randomUUID();
-          uuids.set(uuid, name);
-          const data = fs.readFileSync(tempFilePath);
-          const encryptedBuffer = encrypt(data);
-          const resultingFile = { mimetype: "image/png", encoding: "7bit", data: encryptedBuffer };
+        // Generate uuid and save it with file info in db
+        const newFile = {
+          _id: crypto.randomUUID(),
+          name,
+          size,
+          uploadedAt: Date.now(),
+          mimetype,
+        };
+        young.files[key].push(newFile);
+        const data = fs.readFileSync(tempFilePath);
+        const encryptedBuffer = encrypt(data);
+        const resultingFile = { mimetype: "image/png", encoding: "7bit", data: encryptedBuffer };
 
-          // Upload
-          if (militaryKeys.includes(key)) {
-            await uploadFile(`app/young/${young._id}/military-preparation/${key}/${uuid}`, resultingFile);
-          } else {
-            await uploadFile(`app/young/${young._id}/${key}/${uuid}`, resultingFile);
-          }
-          fs.unlinkSync(tempFilePath);
+        // Upload
+        if (militaryKeys.includes(key)) {
+          await uploadFile(`app/young/${young._id}/military-preparation/${key}/${newFile._id}`, resultingFile);
+        } else {
+          await uploadFile(`app/young/${young._id}/${key}/${newFile._id}`, resultingFile);
         }
+        fs.unlinkSync(tempFilePath);
       }
 
-      // Save both original file names and uuids in db.
-      young.set({ [key]: names });
-      young.set({ uuids: { [key]: uuids } });
-
       await young.save({ fromUser: req.user });
-      return res.status(200).send({ data: names, ok: true });
+      return res.status(200).send({ data: young.files[key], ok: true });
     } catch (error) {
       capture(error);
       if (error === "FILE_CORRUPTED") return res.status(500).send({ ok: false, code: "FILE_CORRUPTED" });
@@ -1127,6 +1130,33 @@ router.put("/young/:id/removeMilitaryFile/:key", passport.authenticate("referent
 
     // Update young document
     young.set({ [value.key]: value.files });
+    await young.save({ fromUser: req.user });
+    return res.status(200).send({ ok: true, data: serializeYoung(young) });
+  } catch (error) {
+    capture(error);
+    res.status(500).send({ ok: false, code: ERRORS.SERVER_ERROR });
+  }
+});
+
+router.delete("/young/:id/removeMilitaryFile/:key/:fileId", passport.authenticate("referent", { session: false, failWithError: true }), async (req, res) => {
+  try {
+    const militaryKeys = ["militaryPreparationFilesIdentity", "militaryPreparationFilesCensus", "militaryPreparationFilesAuthorization", "militaryPreparationFilesCertificate"];
+    const { error, value } = Joi.object({
+      id: Joi.string().required(),
+      key: Joi.string()
+        .required()
+        .valid(...militaryKeys),
+      fileId: Joi.string().required(),
+    }).validate({ ...req.params, ...req.body }, { stripUnknown: true });
+    if (error) return res.status(400).send({ ok: false, code: ERRORS.INVALID_PARAMS });
+
+    const young = await YoungModel.findById(value.id);
+    if (!young) return res.status(404).send({ ok: false, code: ERRORS.NOT_FOUND });
+
+    if (!canViewYoungFile(req.user, young)) return res.status(403).send({ ok: false, code: ERRORS.OPERATION_UNAUTHORIZED });
+
+    deleteFile(`app/young/${young._id}/military-preparation/${value.key}/${value.fileId}`);
+    young.files[value.key].id(value.fileId).remove();
     await young.save({ fromUser: req.user });
     return res.status(200).send({ ok: true, data: serializeYoung(young) });
   } catch (error) {
