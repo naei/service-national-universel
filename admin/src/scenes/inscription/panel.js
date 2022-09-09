@@ -1,9 +1,8 @@
 import React, { useEffect, useState } from "react";
 import { Link, useHistory } from "react-router-dom";
-import { useSelector } from "react-redux";
 import { toastr } from "react-redux-toastr";
 
-import { translate as t, isInRuralArea, getAge, YOUNG_STATUS, ROLES, formatPhoneNumberFR } from "../../utils";
+import { translate as t, isInRuralArea, getAge, YOUNG_STATUS, formatPhoneNumberFR } from "../../utils";
 import DownloadButton from "../../components/buttons/DownloadButton";
 import Historic from "../../components/historic";
 import PatchHistoric from "../../components/views/PatchHistoric";
@@ -17,7 +16,6 @@ import ModalConfirm from "../../components/modals/ModalConfirm";
 
 export default function InscriptionPanel({ onChange, value }) {
   const [young, setYoung] = useState(null);
-  const user = useSelector((state) => state.Auth.user);
   const [modal, setModal] = useState({ isOpen: false, onConfirm: null });
   const history = useHistory();
 
