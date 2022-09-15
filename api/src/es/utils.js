@@ -33,7 +33,7 @@ async function allRecords(index, query, client = esClient) {
     index,
     scroll: "1m",
     size: 1000,
-    body: { query },
+    body: { query, _source: ["firstName", "lastName", "gender", "cohort", "originalCohort"] },
   };
 
   const result = [];

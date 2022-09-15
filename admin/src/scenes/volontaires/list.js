@@ -432,6 +432,33 @@ export default function VolontaireList() {
     },
   ];
 
+  const fieldTitles = [
+    "identity",
+    "contact",
+    "birth",
+    "address",
+    "location",
+    "schoolSituation",
+    "situation",
+    "representative1",
+    "representative2",
+    "consent",
+    "status",
+    "phase1Affectation",
+    "phase1Transport",
+    "phase1DocumentStatus",
+    "phase1DocumentAgreement",
+    "phase1Attendance",
+    "phase2",
+    "accountDetails",
+    "desistement",
+  ];
+
+  function getFieldsToExport(values) {
+    let fields = ["firstName", "lastName", "gender", "cohort", "originalCohort"];
+    return fields;
+  }
+
   return (
     <div>
       <Breadcrumbs items={[{ label: "Volontaires" }]} />
@@ -450,27 +477,7 @@ export default function VolontaireList() {
                   <ModalContainer>
                     <Formik
                       initialValues={{
-                        checked: [
-                          "identity",
-                          "contact",
-                          "birth",
-                          "address",
-                          "location",
-                          "schoolSituation",
-                          "situation",
-                          "representative1",
-                          "representative2",
-                          "consent",
-                          "status",
-                          "phase1Affectation",
-                          "phase1Transport",
-                          "phase1DocumentStatus",
-                          "phase1DocumentAgreement",
-                          "phase1Attendance",
-                          "phase2",
-                          "accountDetails",
-                          "desistement",
-                        ],
+                        checked: fieldTitles,
                       }}>
                       {({ values, setFieldValue }) => (
                         <>
@@ -479,31 +486,7 @@ export default function VolontaireList() {
                             <div className="w-1/2 text-left">Sélectionnez pour choisir des sous-catégories</div>
                             <div className="w-1/2 text-right">
                               {values.checked == "" ? (
-                                <div
-                                  className="text-snu-purple-300 cursor-pointer hover:underline"
-                                  onClick={() =>
-                                    setFieldValue("checked", [
-                                      "identity",
-                                      "contact",
-                                      "birth",
-                                      "address",
-                                      "location",
-                                      "schoolSituation",
-                                      "situation",
-                                      "representative1",
-                                      "representative2",
-                                      "consent",
-                                      "status",
-                                      "phase1Affectation",
-                                      "phase1Transport",
-                                      "phase1DocumentStatus",
-                                      "phase1DocumentAgreement",
-                                      "phase1Attendance",
-                                      "phase2",
-                                      "accountDetails",
-                                      "desistement",
-                                    ])
-                                  }>
+                                <div className="text-snu-purple-300 cursor-pointer hover:underline" onClick={() => setFieldValue("checked", fieldTitles)}>
                                   Tout sélectionner
                                 </div>
                               ) : (
@@ -563,6 +546,7 @@ export default function VolontaireList() {
                                 index="young"
                                 react={{ and: FILTERS }}
                                 transform={(data) => transform(data, values.checked)}
+                                fields={getFieldsToExport(values.checked)}
                               />
                             </div>
                           </div>

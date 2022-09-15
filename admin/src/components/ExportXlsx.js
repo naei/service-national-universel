@@ -16,6 +16,7 @@ export default function ExportComponent({
   transform,
   searchType = "export",
   defaultQuery = () => ({ query: { query: { match_all: {} } } }),
+  fields,
 }) {
   const [exporting, setExporting] = useState(false);
   const [modal, setModal] = useState({ isOpen: false, onConfirm: null });
@@ -61,6 +62,7 @@ export default function ExportComponent({
               exportTitle={exportTitle}
               transform={transform}
               searchType={searchType}
+              fields={fields}
             />
           );
         }}
@@ -85,7 +87,7 @@ export default function ExportComponent({
   );
 }
 
-function Loading({ onFinish, loading, exportTitle, transform, currentQuery, index, searchType }) {
+function Loading({ onFinish, loading, exportTitle, transform, currentQuery, index, searchType, fields }) {
   const STATUS_LOADING = "Récupération des données";
   const STATUS_TRANSFORM = "Mise en forme";
   const STATUS_EXPORT = "Création du fichier";
@@ -104,7 +106,7 @@ function Loading({ onFinish, loading, exportTitle, transform, currentQuery, inde
     if (!status) {
       setStatus(STATUS_LOADING);
     } else if (status === STATUS_LOADING) {
-      getAllResults(index, currentQuery, searchType).then((results) => {
+      getAllResults(index, currentQuery, searchType, fields).then((results) => {
         setData(results);
         setStatus(STATUS_TRANSFORM);
       });
@@ -134,14 +136,20 @@ async function toArrayOfArray(results, transform) {
   return [columns, ...data.map((item) => Object.values(item))];
 }
 
-async function getAllResults(index, query, searchType) {
+async function getAllResults(index, query, searchType, fields) {
   let result;
   if (searchType === "_msearch") {
-    result = await api.esQuery(index, query);
+    result = await api.esQuery(index, query, fields);
     if (!result.responses.length) return [];
     return result.responses[0];
   } else {
+    // console.log(query, fields);
+    // if (fields) {
+    //   query.fields = fields;
+    // }
+    // console.log(query);
     result = await api.post(`/es/${index}/export`, { query });
+    console.log("🚀 ~ file: ExportXlsx.js ~ line 152 ~ getAllResults ~ result", result);
     if (!result.data.length) return [];
     return result.data;
   }
