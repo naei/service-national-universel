@@ -526,7 +526,11 @@ export default function VolontaireList() {
                               showClearAll={false}
                               render={(props) => {
                                 const { selectedValues } = props;
-                                if (selectedValues.value) {
+                                let areAllFiltersEmpty = true;
+                                for (const item of Object.keys(selectedValues)) {
+                                  if (selectedValues[item].value.length > 0) areAllFiltersEmpty = false;
+                                }
+                                if (!areAllFiltersEmpty) {
                                   return (
                                     <div className="rounded-xl bg-gray-50 py-3">
                                       <div className="text-center text-base text-gray-400">Rappel des filtres appliqués</div>
@@ -1139,6 +1143,7 @@ export default function VolontaireList() {
                   URLParams={true}
                   showSearch={false}
                   renderLabel={(items) => getFilterLabel(items, "Statut mission (candidature)", "Statut mission (candidature)")}
+                  showMissing={true}
                 />
                 <MultiDropdownList
                   defaultQuery={getDefaultQuery}

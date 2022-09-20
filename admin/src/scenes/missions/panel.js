@@ -68,7 +68,7 @@ export default function PanelView({ onChange, mission }) {
     mission.name += " (copie)";
     delete mission._id;
     mission.placesLeft = mission.placesTotal;
-    mission.status = MISSION_STATUS.WAITING_VALIDATION;
+    mission.status = MISSION_STATUS.DRAFT;
     const { data, ok, code } = await api.post("/mission", mission);
     if (!ok) toastr.error("Oups, une erreur est survnue lors de la duplication de la mission", translate(code));
     toastr.success("Mission dupliquée !");
@@ -99,15 +99,14 @@ export default function PanelView({ onChange, mission }) {
           <PanelActionButton onClick={onClickDelete} icon="bin" title="Supprimer" />
         </div>
       </div>
-      <Info title="Volontaires">
-        {[ROLES.RESPONSIBLE, ROLES.SUPERVISOR].includes(user.role) ? (
-          <Details title="Candidature(s)" value={applications?.filter((e) => e.status !== "WAITING_ACCEPTATION").length} />
-        ) : (
-          <Details title="Candidature(s)" value={applications?.length} />
+      <Info title="Candidatures">
+        <Details title="Volontaire(s) ayant candidaté" value={applications?.filter((e) => e.status !== "WAITING_ACCEPTATION").length} />
+        {![ROLES.RESPONSIBLE, ROLES.SUPERVISOR].includes(user.role) && (
+          <Details title="Volontaire(s) ayant reçu une proposition de mission" value={applications?.filter((e) => e.status == "WAITING_ACCEPTATION").length} />
         )}
-        <Details title="Validée(s)" value={mission.placesTotal - mission.placesLeft} />
-        <Details title="Disponible(s)" value={mission.placesLeft} />
-        <Details title="Total" value={mission.placesTotal} />
+        <Details title="Place(s) proposée(s)" value={mission.placesTotal} />
+        <Details title="Place(s) occupés(s)" value={mission.placesTotal - mission.placesLeft} />
+        <Details title="Place(s) disponible(s)" value={mission.placesLeft} />
         <Link to={`/mission/${mission._id}/youngs`}>
           <PanelActionButton icon="eye" title="Consulter tous les volontaires" />
         </Link>
