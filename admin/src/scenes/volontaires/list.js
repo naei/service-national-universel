@@ -100,6 +100,192 @@ export default function VolontaireList() {
   const [sessionsPhase1, setSessionsPhase1] = useState(null);
   const [meetingPoints, setMeetingPoints] = useState(null);
   const [filterVisible, setFilterVisible] = useState(false);
+  const [selectedFields, setSelectedFields] = useState({ ID: data?._id });
+
+  let data = { domains: [], periodRanking: [] };
+  let meetingPoint = {};
+  let center = {};
+  const fieldCategories = [
+    {
+      id: "identity",
+      fields: {
+        Prénom: data.firstName,
+        Nom: data.lastName,
+        Sexe: translate(data.gender),
+        Cohorte: data.cohort,
+        "Cohorte d'origine": data.originalCohort,
+      },
+      fieldsToExport: [firstName, lastName, gender, cohort, originalCohort],
+    },
+    {
+      id: "contact",
+      fields: {
+        Email: data.email,
+        Téléphone: data.phone,
+      },
+      fieldsToExport:[email, phone],
+    },
+  ]
+
+    birth: {
+      "Date de naissance": formatDateFRTimezoneUTC(data.birthdateAt),
+      "Pays de naissance": data.birthCountry || "France",
+      "Ville de naissance": data.birthCity,
+      "Code postal de naissance": data.birthCityZip,
+    },
+    address: {
+      "Adresse postale": data.address,
+      "Code postal": data.zip,
+      Ville: data.city,
+      Pays: data.country,
+      "Nom de l'hébergeur": data.hostLastName,
+      "Prénom de l'hébergeur": data.hostFirstName,
+      "Lien avec l'hébergeur": data.hostRelationship,
+      "Adresse - étranger": data.foreignAddress,
+      "Code postal - étranger": data.foreignZip,
+      "Ville - étranger": data.foreignCity,
+      "Pays - étranger": data.foreignCountry,
+    },
+    location: {
+      Département: data.department,
+      Académie: data.academy,
+      Région: data.region,
+    },
+    schoolSituation: {
+      Situation: translate(data.situation),
+      Niveau: translate(data.grade),
+      "Type d'établissement": translate(data.esSchool?.type || data.schoolType),
+      "Nom de l'établissement": data.esSchool?.fullName || data.schoolName,
+      "Code postal de l'établissement": data.esSchool?.postcode || data.schoolZip,
+      "Ville de l'établissement": data.esSchool?.city || data.schoolCity,
+      "Département de l'établissement": departmentLookUp[data.esSchool?.department] || data.schoolDepartment,
+      "UAI de l'établissement": data.esSchool?.uai,
+    },
+    situation: {
+      "Quartier Prioritaire de la ville": translate(data.qpv),
+      "Zone Rurale": translate(isInRuralArea(data)),
+      Handicap: translate(data.handicap),
+      "Bénéficiaire d'un PPS": translate(data.ppsBeneficiary),
+      "Bénéficiaire d'un PAI": translate(data.paiBeneficiary),
+      "Aménagement spécifique": translate(data.specificAmenagment),
+      "Nature de l'aménagement spécifique": translate(data.specificAmenagmentType),
+      "Aménagement pour mobilité réduite": translate(data.reducedMobilityAccess),
+      "Besoin d'être affecté(e) dans le département de résidence": translate(data.handicapInSameDepartment),
+      "Allergies ou intolérances alimentaires": translate(data.allergies),
+      "Activité de haut-niveau": translate(data.highSkilledActivity),
+      "Nature de l'activité de haut-niveau": data.highSkilledActivityType,
+      "Activités de haut niveau nécessitant d'être affecté dans le département de résidence": translate(data.highSkilledActivityInSameDepartment),
+      "Document activité de haut-niveau ": data.highSkilledActivityProofFiles,
+      "Structure médico-sociale": translate(data.medicosocialStructure),
+      "Nom de la structure médico-sociale": data.medicosocialStructureName, // différence avec au-dessus ?
+      "Adresse de la structure médico-sociale": data.medicosocialStructureAddress,
+      "Code postal de la structure médico-sociale": data.medicosocialStructureZip,
+      "Ville de la structure médico-sociale": data.medicosocialStructureCity,
+    },
+    representative1: {
+      "Statut représentant légal 1": translate(data.parent1Status),
+      "Prénom représentant légal 1": data.parent1FirstName,
+      "Nom représentant légal 1": data.parent1LastName,
+      "Email représentant légal 1": data.parent1Email,
+      "Téléphone représentant légal 1": data.parent1Phone,
+      "Adresse représentant légal 1": data.parent1Address,
+      "Code postal représentant légal 1": data.parent1Zip,
+      "Ville représentant légal 1": data.parent1City,
+      "Département représentant légal 1": data.parent1Department,
+      "Région représentant légal 1": data.parent1Region,
+    },
+    representative2: {
+      "Statut représentant légal 2": translate(data.parent2Status),
+      "Prénom représentant légal 2": data.parent2FirstName,
+      "Nom représentant légal 2": data.parent2LastName,
+      "Email représentant légal 2": data.parent2Email,
+      "Téléphone représentant légal 2": data.parent2Phone,
+      "Adresse représentant légal 2": data.parent2Address,
+      "Code postal représentant légal 2": data.parent2Zip,
+      "Ville représentant légal 2": data.parent2City,
+      "Département représentant légal 2": data.parent2Department,
+      "Région représentant légal 2": data.parent2Region,
+    },
+    consent: {
+      "Consentement des représentants légaux": translate(data.parentConsentment),
+    },
+    status: {
+      "Statut général": translate(data.status),
+      Phase: translate(data.phase),
+      "Statut Phase 1": translatePhase1(data.statusPhase1),
+      "Statut Phase 2": translatePhase2(data.statusPhase2),
+      "Statut Phase 3": translate(data.statusPhase3),
+      "Dernier statut le": formatLongDateFR(data.lastStatusAt),
+    },
+    phase1Affectation: {
+      "ID centre": center._id || "",
+      "Code centre (2021)": center.code || "",
+      "Code centre (2022)": center.code2022 || "",
+      "Nom du centre": center.name || "",
+      "Ville du centre": center.city || "",
+      "Département du centre": center.department || "",
+      "Région du centre": center.region || "",
+    },
+    phase1Transport: {
+      "Se rend au centre par ses propres moyens": translate(data.deplacementPhase1Autonomous),
+      // "Transport géré hors plateforme": // Doublon?
+      "Bus n˚": meetingPoint?.busExcelId,
+      "Adresse point de rassemblement": meetingPoint?.departureAddress,
+      "Date aller": meetingPoint?.departureAtString,
+      "Date retour": meetingPoint?.returnAtString,
+    },
+    phase1DocumentStatus: {
+      "Droit à l'image - Statut": translateFileStatusPhase1(data.imageRightFilesStatus) || "Non Renseigné",
+      "Autotest PCR - Statut": translateFileStatusPhase1(data.autoTestPCRFilesStatus) || "Non Renseigné",
+      "Règlement intérieur": translate(data.rulesYoung),
+      "Fiche sanitaire réceptionnée": translate(data.cohesionStayMedicalFileReceived) || "Non Renseigné",
+    },
+    phase1DocumentAgreement: {
+      "Droit à l'image - Accord": translate(data.imageRight),
+      "Autotest PCR - Accord": translate(data.autoTestPCR),
+    },
+    phase1Attendance: {
+      "Présence à l'arrivée": !data.cohesionStayPresence ? "Non renseignée" : data.cohesionStayPresence === "true" ? "Présent" : "Absent",
+      "Présence à la JDM": !data.presenceJDM ? "Non renseignée" : data.presenceJDM === "true" ? "Présent" : "Absent",
+      "Date de départ": !data.departSejourAt ? "Non renseignée" : formatDateFRTimezoneUTC(data.departSejourAt),
+      "Motif du départ": data?.departSejourMotif,
+    },
+    phase2: {
+      "Domaine de MIG 1": data.domains[0],
+      "Domaine de MIG 2": data.domains[1],
+      "Domaine de MIG 3": data.domains[2],
+      "Projet professionnel": translate(data.professionnalProject),
+      "Information supplémentaire sur le projet professionnel": data.professionnalProjectPrecision,
+      "Période privilégiée pour réaliser des missions": data.period,
+      "Choix 1 période": translate(data.periodRanking[0]),
+      "Choix 2 période": translate(data.periodRanking[1]),
+      "Choix 3 période": translate(data.periodRanking[2]),
+      "Choix 4 période": translate(data.periodRanking[3]),
+      "Choix 5 période": translate(data.periodRanking[4]),
+      "Mobilité aux alentours de son établissement": translate(data.mobilityNearSchool),
+      "Mobilité aux alentours de son domicile": translate(data.mobilityNearHome),
+      "Mobilité aux alentours d'un de ses proches": translate(data.mobilityNearRelative),
+      "Informations du proche":
+        data.mobilityNearRelative &&
+        [data.mobilityNearRelativeName, data.mobilityNearRelativeAddress, data.mobilityNearRelativeZip, data.mobilityNearRelativeCity].filter((e) => e)?.join(", "),
+      "Mode de transport": data.mobilityTransport?.map((t) => translate(t)).join(", "),
+      "Autre mode de transport": data.mobilityTransportOther,
+      "Format de mission": translate(data.missionFormat),
+      "Engagement dans une structure en dehors du SNU": translate(data.engaged),
+      "Description engagement ": data.engagedDescription,
+      "Souhait MIG": data.desiredLocation,
+    },
+    accountDetails: {
+      "Créé lé": formatLongDateFR(data.createdAt),
+      "Mis à jour le": formatLongDateFR(data.updatedAt),
+      "Dernière connexion le": formatLongDateFR(data.lastLoginAt),
+    },
+    desistement: {
+      "Raison du désistement": getLabelWithdrawnReason(data.withdrawnReason),
+      "Message de désistement": data.withdrawnMessage,
+      // Date du désistement: // not found in db
+    },
+  };
 
   const [infosHover, setInfosHover] = useState(false);
   const [infosClick, setInfosClick] = useState(false);
@@ -146,194 +332,21 @@ export default function VolontaireList() {
       }
     }
     return all.map((data) => {
-      let center = {};
       if (data.sessionPhase1Id && centers && sessionsPhase1) {
         center = centers.find((c) => sessionsPhase1.find((sessionPhase1) => sessionPhase1._id === data.sessionPhase1Id)?.cohesionCenterId === c._id);
         if (!center) center = {};
       }
-      let meetingPoint = {};
       if (data.meetingPointId && meetingPoints) {
         meetingPoint = meetingPoints.find((mp) => mp._id === data.meetingPointId);
         if (!meetingPoint) meetingPoint = {};
       }
-      const COLUMNS = {
-        identity: {
-          Prénom: data.firstName,
-          Nom: data.lastName,
-          Sexe: translate(data.gender),
-          Cohorte: data.cohort,
-          "Cohorte d'origine": data.originalCohort,
-        },
-        contact: {
-          Email: data.email,
-          Téléphone: data.phone,
-        },
-        birth: {
-          "Date de naissance": formatDateFRTimezoneUTC(data.birthdateAt),
-          "Pays de naissance": data.birthCountry || "France",
-          "Ville de naissance": data.birthCity,
-          "Code postal de naissance": data.birthCityZip,
-        },
-        address: {
-          "Adresse postale": data.address,
-          "Code postal": data.zip,
-          Ville: data.city,
-          Pays: data.country,
-          "Nom de l'hébergeur": data.hostLastName,
-          "Prénom de l'hébergeur": data.hostFirstName,
-          "Lien avec l'hébergeur": data.hostRelationship,
-          "Adresse - étranger": data.foreignAddress,
-          "Code postal - étranger": data.foreignZip,
-          "Ville - étranger": data.foreignCity,
-          "Pays - étranger": data.foreignCountry,
-        },
-        location: {
-          Département: data.department,
-          Académie: data.academy,
-          Région: data.region,
-        },
-        schoolSituation: {
-          Situation: translate(data.situation),
-          Niveau: translate(data.grade),
-          "Type d'établissement": translate(data.esSchool?.type || data.schoolType),
-          "Nom de l'établissement": data.esSchool?.fullName || data.schoolName,
-          "Code postal de l'établissement": data.esSchool?.postcode || data.schoolZip,
-          "Ville de l'établissement": data.esSchool?.city || data.schoolCity,
-          "Département de l'établissement": departmentLookUp[data.esSchool?.department] || data.schoolDepartment,
-          "UAI de l'établissement": data.esSchool?.uai,
-        },
-        situation: {
-          "Quartier Prioritaire de la ville": translate(data.qpv),
-          "Zone Rurale": translate(isInRuralArea(data)),
-          Handicap: translate(data.handicap),
-          "Bénéficiaire d'un PPS": translate(data.ppsBeneficiary),
-          "Bénéficiaire d'un PAI": translate(data.paiBeneficiary),
-          "Aménagement spécifique": translate(data.specificAmenagment),
-          "Nature de l'aménagement spécifique": translate(data.specificAmenagmentType),
-          "Aménagement pour mobilité réduite": translate(data.reducedMobilityAccess),
-          "Besoin d'être affecté(e) dans le département de résidence": translate(data.handicapInSameDepartment),
-          "Allergies ou intolérances alimentaires": translate(data.allergies),
-          "Activité de haut-niveau": translate(data.highSkilledActivity),
-          "Nature de l'activité de haut-niveau": data.highSkilledActivityType,
-          "Activités de haut niveau nécessitant d'être affecté dans le département de résidence": translate(data.highSkilledActivityInSameDepartment),
-          "Document activité de haut-niveau ": data.highSkilledActivityProofFiles,
-          "Structure médico-sociale": translate(data.medicosocialStructure),
-          "Nom de la structure médico-sociale": data.medicosocialStructureName, // différence avec au-dessus ?
-          "Adresse de la structure médico-sociale": data.medicosocialStructureAddress,
-          "Code postal de la structure médico-sociale": data.medicosocialStructureZip,
-          "Ville de la structure médico-sociale": data.medicosocialStructureCity,
-        },
-        representative1: {
-          "Statut représentant légal 1": translate(data.parent1Status),
-          "Prénom représentant légal 1": data.parent1FirstName,
-          "Nom représentant légal 1": data.parent1LastName,
-          "Email représentant légal 1": data.parent1Email,
-          "Téléphone représentant légal 1": data.parent1Phone,
-          "Adresse représentant légal 1": data.parent1Address,
-          "Code postal représentant légal 1": data.parent1Zip,
-          "Ville représentant légal 1": data.parent1City,
-          "Département représentant légal 1": data.parent1Department,
-          "Région représentant légal 1": data.parent1Region,
-        },
-        representative2: {
-          "Statut représentant légal 2": translate(data.parent2Status),
-          "Prénom représentant légal 2": data.parent2FirstName,
-          "Nom représentant légal 2": data.parent2LastName,
-          "Email représentant légal 2": data.parent2Email,
-          "Téléphone représentant légal 2": data.parent2Phone,
-          "Adresse représentant légal 2": data.parent2Address,
-          "Code postal représentant légal 2": data.parent2Zip,
-          "Ville représentant légal 2": data.parent2City,
-          "Département représentant légal 2": data.parent2Department,
-          "Région représentant légal 2": data.parent2Region,
-        },
-        consent: {
-          "Consentement des représentants légaux": translate(data.parentConsentment),
-        },
-        status: {
-          "Statut général": translate(data.status),
-          Phase: translate(data.phase),
-          "Statut Phase 1": translatePhase1(data.statusPhase1),
-          "Statut Phase 2": translatePhase2(data.statusPhase2),
-          "Statut Phase 3": translate(data.statusPhase3),
-          "Dernier statut le": formatLongDateFR(data.lastStatusAt),
-        },
-        phase1Affectation: {
-          "ID centre": center._id || "",
-          "Code centre (2021)": center.code || "",
-          "Code centre (2022)": center.code2022 || "",
-          "Nom du centre": center.name || "",
-          "Ville du centre": center.city || "",
-          "Département du centre": center.department || "",
-          "Région du centre": center.region || "",
-        },
-        phase1Transport: {
-          "Se rend au centre par ses propres moyens": translate(data.deplacementPhase1Autonomous),
-          // "Transport géré hors plateforme": // Doublon?
-          "Bus n˚": meetingPoint?.busExcelId,
-          "Adresse point de rassemblement": meetingPoint?.departureAddress,
-          "Date aller": meetingPoint?.departureAtString,
-          "Date retour": meetingPoint?.returnAtString,
-        },
-        phase1DocumentStatus: {
-          "Droit à l'image - Statut": translateFileStatusPhase1(data.imageRightFilesStatus) || "Non Renseigné",
-          "Autotest PCR - Statut": translateFileStatusPhase1(data.autoTestPCRFilesStatus) || "Non Renseigné",
-          "Règlement intérieur": translate(data.rulesYoung),
-          "Fiche sanitaire réceptionnée": translate(data.cohesionStayMedicalFileReceived) || "Non Renseigné",
-        },
-        phase1DocumentAgreement: {
-          "Droit à l'image - Accord": translate(data.imageRight),
-          "Autotest PCR - Accord": translate(data.autoTestPCR),
-        },
-        phase1Attendance: {
-          "Présence à l'arrivée": !data.cohesionStayPresence ? "Non renseignée" : data.cohesionStayPresence === "true" ? "Présent" : "Absent",
-          "Présence à la JDM": !data.presenceJDM ? "Non renseignée" : data.presenceJDM === "true" ? "Présent" : "Absent",
-          "Date de départ": !data.departSejourAt ? "Non renseignée" : formatDateFRTimezoneUTC(data.departSejourAt),
-          "Motif du départ": data?.departSejourMotif,
-        },
-        phase2: {
-          "Domaine de MIG 1": data.domains[0],
-          "Domaine de MIG 2": data.domains[1],
-          "Domaine de MIG 3": data.domains[2],
-          "Projet professionnel": translate(data.professionnalProject),
-          "Information supplémentaire sur le projet professionnel": data.professionnalProjectPrecision,
-          "Période privilégiée pour réaliser des missions": data.period,
-          "Choix 1 période": translate(data.periodRanking[0]),
-          "Choix 2 période": translate(data.periodRanking[1]),
-          "Choix 3 période": translate(data.periodRanking[2]),
-          "Choix 4 période": translate(data.periodRanking[3]),
-          "Choix 5 période": translate(data.periodRanking[4]),
-          "Mobilité aux alentours de son établissement": translate(data.mobilityNearSchool),
-          "Mobilité aux alentours de son domicile": translate(data.mobilityNearHome),
-          "Mobilité aux alentours d'un de ses proches": translate(data.mobilityNearRelative),
-          "Informations du proche":
-            data.mobilityNearRelative &&
-            [data.mobilityNearRelativeName, data.mobilityNearRelativeAddress, data.mobilityNearRelativeZip, data.mobilityNearRelativeCity].filter((e) => e)?.join(", "),
-          "Mode de transport": data.mobilityTransport?.map((t) => translate(t)).join(", "),
-          "Autre mode de transport": data.mobilityTransportOther,
-          "Format de mission": translate(data.missionFormat),
-          "Engagement dans une structure en dehors du SNU": translate(data.engaged),
-          "Description engagement ": data.engagedDescription,
-          "Souhait MIG": data.desiredLocation,
-        },
-        accountDetails: {
-          "Créé lé": formatLongDateFR(data.createdAt),
-          "Mis à jour le": formatLongDateFR(data.updatedAt),
-          "Dernière connexion le": formatLongDateFR(data.lastLoginAt),
-        },
-        desistement: {
-          "Raison du désistement": getLabelWithdrawnReason(data.withdrawnReason),
-          "Message de désistement": data.withdrawnMessage,
-          // Date du désistement: // not found in db
-        },
-      };
 
       let columns = { ID: data._id };
       for (const element of values) {
         let key;
         for (key in COLUMNS[element]) columns[key] = COLUMNS[element][key];
       }
-      return columns;
+      return selectedFields;
     });
   }
 
@@ -532,11 +545,11 @@ export default function VolontaireList() {
                             />
 
                             <div className="flex pt-4 pb-1">
-                              <div className="w-1/2 text-left">Sélectionnez pour choisir des sous-catégories</div>
+                              <div className="w-1/# text-left">Sélectionnez pour choisir des sous-catégories</div>
                               <div className="w-1/2 text-right flex flex-row-reverse">
                                 {values.checked == "" ? (
                                   <div
-                                    className="text-snu-purple-300 cursor-pointer"
+                                    className="text-snu-purple-300 cursor-pointer hover:text-snu-purple-600"
                                     onClick={() =>
                                       setFieldValue(
                                         "checked",
@@ -546,7 +559,7 @@ export default function VolontaireList() {
                                     Tout sélectionner
                                   </div>
                                 ) : (
-                                  <div className="text-snu-purple-300 cursor-pointer" onClick={() => setFieldValue("checked", [])}>
+                                  <div className="text-snu-purple-300 cursor-pointer hover:text-snu-purple-600" onClick={() => setFieldValue("checked", [])}>
                                     Tout déselectionner
                                   </div>
                                 )}
@@ -559,10 +572,25 @@ export default function VolontaireList() {
                             </div>
                           </div>
 
-                          <div className="h-[60vh] overflow-auto grid grid-cols-2 gap-4 w-full p-3">
-                            {fieldsAvailable.map((cat) => (
-                              <ExportFieldCard key={cat.value} field={cat} values={values} setFieldValue={setFieldValue} />
-                            ))}
+                          <div className="flex">
+                            <div className="h-[60vh] overflow-auto grid grid-cols-2 gap-4 w-2/3 p-3">
+                              {fieldCategories.map((group) => (
+                                <ExportFieldCard
+                                  key={group}
+                                  field={group}
+                                  values={values}
+                                  setFieldValue={setFieldValue}
+                                  selectedFields={selectedFields}
+                                  setSelectedFields={setSelectedFields}
+                                  fieldCategories={fieldCategories}
+                                />
+                              ))}
+                            </div>
+                            <div className="w-1/3">
+                              {Object.keys(selectedFields)?.map((e) => (
+                                <div key={e}>{e}</div>
+                              ))}
+                            </div>
                           </div>
                           <div className="flex gap-2 justify-center mb-3">
                             <div className="w-1/2 p-0.5">

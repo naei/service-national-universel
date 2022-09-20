@@ -1,19 +1,27 @@
 import React, { useState } from "react";
 import { Field } from "formik";
 
-export default function ExportFieldCard({ field, values, setFieldValue }) {
+export default function ExportFieldCard({ fields, values, setFieldValue, selectedFields, setSelectedFields, fieldGroups }) {
+  console.log("🚀 ~ file: ExportFIeldCard.js ~ line 5 ~ ExportFieldCard ~ fields", fields);
   const [isOpen, setIsOpen] = useState(false);
 
   return (
-    <div key={field.value} className="rounded-xl border-2 border-gray-100 px-3 py-2 hover:shadow-ninaButton cursor-pointer">
+    <div className="rounded-xl border-2 border-gray-100 px-3 py-2 hover:shadow-ninaButton cursor-pointer">
       <div
         onClick={() => {
-          if (!values.checked.includes(field.value)) {
+          if (!values.checked.includes(fields.value)) {
             const newValues = [...values.checked, field.value];
+            console.log("🚀 ~ file: ExportFIeldCard.js ~ line 16 ~ ExportFieldCard ~ fieldGroups[field.value]", fieldGroups[field.value]);
             setFieldValue("checked", newValues);
+            setSelectedFields((selectedFields) => ({ ...selectedFields, ...fieldGroups[field.value] }));
           } else {
             const newValues = values.checked.filter((item) => item !== field.value);
             setFieldValue("checked", newValues);
+            let copiedSelectedFields = { ...selectedFields };
+            for (const item in fieldGroups[field.value]) {
+              delete copiedSelectedFields[item];
+            }
+            setSelectedFields(() => ({ ...copiedSelectedFields }));
           }
         }}>
         <div className="flex justify-between w-full">
@@ -23,7 +31,7 @@ export default function ExportFieldCard({ field, values, setFieldValue }) {
           </div>
         </div>
         <div className={`w-full text-gray-400 text-left h-${isOpen ? "auto" : 16} overflow-hidden`}>
-          {field.desc.map((e) => (
+          {Object.values(fields).map((e) => (
             <div key={e}>{e}</div>
           ))}
         </div>
