@@ -35,6 +35,7 @@ async function allRecords(index, query, client = esClient) {
     size: 1000,
     body: { query },
   };
+  console.log("🚀 ~ file: utils.js ~ line 38 ~ allRecords ~ query", query);
 
   const result = [];
 

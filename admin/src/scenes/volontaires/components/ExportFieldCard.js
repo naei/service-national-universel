@@ -1,8 +1,7 @@
 import React, { useState } from "react";
 import { Field } from "formik";
 
-export default function ExportFieldCard({ category, values, setFieldValue, selectedFields, setSelectedFields, fieldCategories }) {
-  console.log("🚀 ~ file: ExportFieldCard.js ~ line 5 ~ ExportFieldCard ~ category", category);
+export default function ExportFieldCard({ category, values, setFieldValue }) {
   const [isOpen, setIsOpen] = useState(false);
 
   return (
@@ -11,17 +10,10 @@ export default function ExportFieldCard({ category, values, setFieldValue, selec
         onClick={() => {
           if (!values.checked.includes(category.id)) {
             const newValues = [...values.checked, category.id];
-            console.log("🚀 ~ file: ExportFIeldCard.js ~ line 16 ~ ExportFieldCard ~ fieldGroups[field.value]", fieldCategories[category.id]);
             setFieldValue("checked", newValues);
-            setSelectedFields((selectedFields) => ({ ...selectedFields, ...category.fields }));
           } else {
             const newValues = values.checked.filter((item) => item !== category.id);
             setFieldValue("checked", newValues);
-            let copiedSelectedFields = { ...selectedFields };
-            for (const item in category.fields) {
-              delete copiedSelectedFields[item];
-            }
-            setSelectedFields(() => ({ ...copiedSelectedFields }));
           }
         }}>
         <div className="flex justify-between w-full">
@@ -36,7 +28,7 @@ export default function ExportFieldCard({ category, values, setFieldValue, selec
           ))}
         </div>
       </div>
-      {category.fields.length > 3 && (
+      {Object.keys(category.fields).length > 3 && (
         <button className="text-gray-500 text-center w-full hover:text-gray-800" onClick={() => setIsOpen(!isOpen)}>
           {!isOpen ? "Voir plus" : "Réduire"}
         </button>

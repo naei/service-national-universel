@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import { DropdownItem, DropdownMenu, DropdownToggle, Modal, UncontrolledDropdown } from "reactstrap";
 import { ReactiveBase, MultiDropdownList, DataSearch, SelectedFilters, StateProvider } from "@appbaseio/reactivesearch";
 import { useSelector } from "react-redux";
@@ -100,10 +100,9 @@ export default function VolontaireList() {
   const [sessionsPhase1, setSessionsPhase1] = useState(null);
   const [meetingPoints, setMeetingPoints] = useState(null);
   const [filterVisible, setFilterVisible] = useState(false);
-  const [selectedFields, setSelectedFields] = useState({ ID: data?._id });
-  const fieldsToExport = ["_id"];
+  const fieldsToExport = useRef(["_id"]);
 
-  let data = { domains: [], periodRanking: [] };
+  const data = useRef({ domains: [], periodRanking: [] });
   let meetingPoint = {};
   let center = {};
   const fieldCategories = [
@@ -319,7 +318,10 @@ export default function VolontaireList() {
   });
   const getExportQuery = () => ({ ...getDefaultQuery(), size: ES_NO_LIMIT });
 
-  async function transform(data) {
+  async function transform(input, selectedFieldIds) {
+    console.log("🚀 ~ file: list.js ~ line 322 ~ transform ~ input", input);
+    data.current = input;
+    console.log("🚀 ~ file: list.js ~ line 347 ~ returnall.map ~ fieldCategories", fieldCategories);
     let all = data;
     const schoolsId = [...new Set(data.map((item) => item.schoolId).filter((e) => e))];
     if (schoolsId?.length) {
@@ -341,156 +343,16 @@ export default function VolontaireList() {
         meetingPoint = meetingPoints.find((mp) => mp._id === data.meetingPointId);
         if (!meetingPoint) meetingPoint = {};
       }
+      let selectedFields = { ID: data?._id };
+      for (const category of fieldCategories) {
+        if (selectedFieldIds.includes(category.id)) {
+          selectedFields = { ...selectedFields, ...category.fields };
+        }
+      }
+      console.log("🚀 ~ file: list.js ~ line 349 ~ returnall.map ~ selectedFields", selectedFields);
       return selectedFields;
     });
   }
-
-  const fieldsAvailable = [
-    {
-      title: "Identité du volontaire",
-      desc: ["Prénom", "Nom", "Sexe", "Cohorte", "Cohorte d'origine"],
-      value: "identity",
-    },
-    {
-      title: "Contact du volontaire",
-      desc: ["Email", "Téléphone"],
-      value: "contact",
-    },
-    {
-      title: "Date et lieu de naissance du volontaire",
-      desc: ["Date de naissance", "Pays de naissance", "Ville de naissance", "Code postal de naissance"],
-      value: "birth",
-    },
-    {
-      title: "Lieu de résidence du volontaire",
-      desc: [
-        "Adresse postale",
-        "Code postal",
-        "Ville, pays, nom et prénom de l'hébergeur",
-        "Lien avec l'hébergeur",
-        "Adresse - étranger",
-        "Code postal - étranger",
-        "Ville - étranger",
-        "Pays - étranger",
-      ],
-      value: "address",
-    },
-    {
-      title: "Localisation du volontaire",
-      desc: ["Département", "Académie", "Région"],
-      value: "location",
-    },
-    {
-      title: "Situation scolaire",
-      desc: [
-        "Niveau",
-        "Type d'établissement",
-        "Nom de l'établissement",
-        "Code postal de l'établissement",
-        "Ville de l'établissement",
-        "Département de l'établissement",
-        "UAI de l'établissement",
-      ],
-      value: "schoolSituation",
-    },
-    {
-      title: "Situation particulière",
-      desc: [
-        "Quartier Prioritaire de la ville",
-        "Zone Rurale",
-        "Handicap",
-        "PPS",
-        "PAI",
-        "Aménagement spécifique",
-        "Nature de l'aménagement spécifique",
-        "Aménagement pour mobilité réduite",
-        "Besoin d'être affecté(e) dans le département de résidence",
-        "Allergies ou intolérances alimentaires",
-        "Activité de haut-niveau",
-        "Nature de l'activité de haut-niveau",
-        "Activités de haut niveau nécessitant d'être affecté dans le département de résidence",
-        "Document activité de haut-niveau",
-        "Structure médico-sociale",
-        "Nom de la structure médico-sociale",
-        "Adresse de la structure médico-sociale",
-        "Code postal de la structure médico-sociale",
-        "Ville de la structure médico-sociale",
-      ],
-      value: "situation",
-    },
-    {
-      title: "Représentant légal 1",
-      desc: ["Statut", "Nom", "Prénom", "Email", "Téléphone", "Adresse", "Code postal", "Ville", "Département et région du représentant légal"],
-      value: "representative1",
-    },
-    {
-      title: "Représentant légal 2",
-      desc: ["Statut", "Nom", "Prénom", "Email", "Téléphone", "Adresse", "Code postal", "Ville", "Département et région du représentant légal"],
-      value: "representative2",
-    },
-    {
-      title: "Consentement",
-      desc: ["Consentement des représentants légaux."],
-      value: "consent",
-    },
-    {
-      title: "Statut",
-      desc: ["Statut général", "Statut phase 1", "Statut phase 2", "Statut phase 3", "Date du dernier statut"],
-      value: "status",
-    },
-    {
-      title: "Phase 1 - Affectation ",
-      desc: ["ID", "Code", "Nom", "Ville", "Département et région du centre"],
-      value: "phase1Affectation",
-    },
-    {
-      title: "Phase 1 - Transport",
-      desc: ["Autonomie", "Numéro de bus", "Point de rassemblement", "Dates d'aller et de retour"],
-      value: "phase1Transport",
-    },
-    {
-      title: "Phase 1 - Statut des documents",
-      desc: ["Droit à l'image", "Autotest PCR", "Règlement intérieur", "Fiche sanitaire"],
-      value: "phase1DocumentStatus",
-    },
-    {
-      title: "Phase 1 - Accords",
-      desc: ["Accords pour droit à l'image et autotests PCR."],
-      value: "phase1DocumentAgreement",
-    },
-    {
-      title: "Phase 1 - Présence",
-      desc: ["Présence à l'arrivé", "Présence à la JDM", "Date de départ", "Motif de départ"],
-      value: "phase1Attendance",
-    },
-    {
-      title: "Phase 2",
-      desc: [
-        "Domaines MIG 1, MIG 2 et MIG 3",
-        "Projet professionnel",
-        "Période privilégiée",
-        "Choix de périodes",
-        "Mobilité",
-        "Mobilité autour d'un proche",
-        "Information du proche",
-        "Mode de transport",
-        "Format de mission",
-        "Engagement hors SNU",
-        "Souhait MIG",
-      ],
-      value: "phase2",
-    },
-    {
-      title: "Compte",
-      desc: ["Dates de création, d'édition et de dernière connexion."],
-      value: "accountDetails",
-    },
-    {
-      title: "Désistement",
-      desc: ["Raison du désistement", "Message de désistement"],
-      value: "desistement",
-    },
-  ];
 
   return (
     <div>
@@ -505,12 +367,17 @@ export default function VolontaireList() {
               <div style={{ display: "flex", flexWrap: "wrap", gap: ".25rem", justifyContent: "flex-end" }}>
                 {/* Column selection modal */}
 
-                <LoadingButton onClick={() => setColumnModalOpen(true)}>Exporter les volontaires</LoadingButton>
+                <LoadingButton
+                  onClick={() => {
+                    setColumnModalOpen(true);
+                  }}>
+                  Exporter les volontaires
+                </LoadingButton>
                 <Modal toggle={() => setColumnModalOpen(false)} isOpen={columnModalOpen} onCancel={() => setColumnModalOpen(false)} size="xl" centered>
                   <ModalContainer>
                     <Formik
                       initialValues={{
-                        checked: fieldsAvailable.map((e) => e.value),
+                        checked: fieldCategories.map((e) => e.id),
                       }}>
                       {({ values, setFieldValue }) => (
                         <>
@@ -552,9 +419,8 @@ export default function VolontaireList() {
                                     onClick={() => {
                                       setFieldValue(
                                         "checked",
-                                        fieldsAvailable.map((e) => e.value),
+                                        fieldCategories.map((e) => e.id),
                                       );
-                                      setSelectedFields();
                                     }}>
                                     Tout sélectionner
                                   </div>
@@ -563,7 +429,6 @@ export default function VolontaireList() {
                                     className="text-snu-purple-300 cursor-pointer hover:text-snu-purple-600"
                                     onClick={() => {
                                       setFieldValue("checked", []);
-                                      setSelectedFields({ ID: data._id });
                                     }}>
                                     Tout déselectionner
                                   </div>
@@ -577,26 +442,11 @@ export default function VolontaireList() {
                             </div>
                           </div>
 
-                          {/* <div className="flex"> */}
                           <div className="h-[60vh] overflow-auto grid grid-cols-2 gap-4 w-full p-3">
                             {fieldCategories.map((category) => (
-                              <ExportFieldCard
-                                key={category.id}
-                                category={category}
-                                values={values}
-                                setFieldValue={setFieldValue}
-                                selectedFields={selectedFields}
-                                setSelectedFields={setSelectedFields}
-                                fieldCategories={fieldCategories}
-                              />
+                              <ExportFieldCard key={category.id} category={category} values={values} setFieldValue={setFieldValue} />
                             ))}
                           </div>
-                          {/* <div className="w-1/3">
-                              {Object.keys(selectedFields)?.map((e) => (
-                                <div key={e}>{e}</div>
-                              ))}
-                            </div>
-                          </div> */}
                           <div className="flex gap-2 justify-center mb-3">
                             <div className="w-1/2 p-0.5">
                               <ModalButton onClick={() => setColumnModalOpen(false)}>Annuler</ModalButton>
@@ -610,6 +460,7 @@ export default function VolontaireList() {
                                 index="young"
                                 react={{ and: FILTERS }}
                                 transform={(data) => transform(data, values.checked)}
+                                fieldsToExport={fieldsToExport}
                               />
                             </div>
                           </div>

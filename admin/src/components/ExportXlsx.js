@@ -16,6 +16,7 @@ export default function ExportComponent({
   transform,
   searchType = "export",
   defaultQuery = () => ({ query: { query: { match_all: {} } } }),
+  fieldsToExport,
 }) {
   const [exporting, setExporting] = useState(false);
   const [modal, setModal] = useState({ isOpen: false, onConfirm: null });
@@ -61,6 +62,7 @@ export default function ExportComponent({
               exportTitle={exportTitle}
               transform={transform}
               searchType={searchType}
+              fieldsToExport={fieldsToExport}
             />
           );
         }}
@@ -85,7 +87,7 @@ export default function ExportComponent({
   );
 }
 
-function Loading({ onFinish, loading, exportTitle, transform, currentQuery, index, searchType }) {
+function Loading({ onFinish, loading, exportTitle, transform, currentQuery, index, searchType, fieldsToExport }) {
   const STATUS_LOADING = "Récupération des données";
   const STATUS_TRANSFORM = "Mise en forme";
   const STATUS_EXPORT = "Création du fichier";
@@ -104,6 +106,7 @@ function Loading({ onFinish, loading, exportTitle, transform, currentQuery, inde
     if (!status) {
       setStatus(STATUS_LOADING);
     } else if (status === STATUS_LOADING) {
+      console.log("fieldsToExport:", fieldsToExport);
       getAllResults(index, currentQuery, searchType).then((results) => {
         setData(results);
         setStatus(STATUS_TRANSFORM);
@@ -129,6 +132,8 @@ function Loading({ onFinish, loading, exportTitle, transform, currentQuery, inde
 }
 
 async function toArrayOfArray(results, transform) {
+  console.log("🚀 ~ file: ExportXlsx.js ~ line 135 ~ toArrayOfArray ~ results", results);
+  console.log("🚀 ~ file: ExportXlsx.js ~ line 135 ~ toArrayOfArray ~ transform", transform);
   const data = transform ? await transform(results) : results;
   let columns = Object.keys(data[0] ?? []);
   return [columns, ...data.map((item) => Object.values(item))];
