@@ -30,9 +30,7 @@ export function DownloadButton({ className = "", onClick = () => {}, href, targe
 
 export function MoreButton({ className = "", onClick = () => {} }) {
   return (
-    <div
-      className={`flex items-center justify-center w-[32px] h-[32px] rounded-[100px] bg-[#E5E7EB] cursor-pointer group hover:bg-[#4B5563] flex items-center justify-center ${className}`}
-      onClick={onClick}>
+    <div className={`flex items-center justify-center w-[32px] h-[32px] rounded-[100px] bg-[#E5E7EB] cursor-pointer group hover:bg-[#4B5563] ${className}`} onClick={onClick}>
       <div className="bg-[#4B5563] w-[2px] h-[2px] mr-[2px] group-hover:bg-white" />
       <div className="bg-[#4B5563] w-[2px] h-[2px] mr-[2px] group-hover:bg-white" />
       <div className="bg-[#4B5563] w-[2px] h-[2px] group-hover:bg-white" />
@@ -43,9 +41,9 @@ export function MoreButton({ className = "", onClick = () => {} }) {
 export function DeleteButton({ className = "", onClick = () => {} }) {
   return (
     <div
-      className={`flex items-center justify-center w-[32px] h-[32px] rounded-[100px] bg-[#EF4444] cursor-pointer group border-[1px] border-[transparent] hover:bg-[#FFFFFF] hover:border-[#EF4444] ${className}`}
+      className={`flex items-center justify-center w-[32px] h-[32px] rounded-[100px] bg-slate-100 cursor-pointer group border-[1px] border-[transparent] hover:bg-slate-600  ${className}`}
       onClick={onClick}>
-      <Bin className="w-[14px] h-[14px] text-[#FFFFFF] group-hover:text-[#EF4444]" />
+      <Bin className="w-[14px] h-[14px] group-hover:text-white" />
     </div>
   );
 }

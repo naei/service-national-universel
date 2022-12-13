@@ -206,6 +206,7 @@ function CniModal({ young, onClose, mode, blockUpload }) {
   return (
     <Modal size="md" centered isOpen={true} toggle={() => onClose(changes)}>
       <div className="bg-white rounded-[8px]">
+        <h1 className="p-6 text-lg text-center">Pièce d&apos;identité</h1>
         <div className="p-[24px]">
           {cniFiles.length > 0 || (blockUpload && filesToUpload?.length > 0) ? (
             cniFiles.map((file) => (
@@ -221,91 +222,89 @@ function CniModal({ young, onClose, mode, blockUpload }) {
             <div className="text-[14px] text-[#6B7280] text-center">Aucune pièce d&apos;identité</div>
           )}
           {error && <div className="text-[#EF4444] text-[12px] leading-[1.4em] mt-[16px]">{error}</div>}
-          {mode === "edition" && (
-            <>
-              <input
-                type="file"
-                multiple
-                id="file-upload"
-                name="file-upload"
-                accept=".png, .jpg, .jpeg, .pdf"
-                onChange={(e) => {
-                  if (blockUpload) {
-                    const array = [];
-                    let error = "";
-                    for (const file of e.target.files) {
-                      if (file.size > 5000000) {
-                        error += `Le fichier ${file.name} est trop volumineux.`;
-                      } else {
-                        array.push(file);
-                      }
+          <>
+            <input
+              type="file"
+              multiple
+              id="file-upload"
+              name="file-upload"
+              accept=".png, .jpg, .jpeg, .pdf"
+              onChange={(e) => {
+                if (blockUpload) {
+                  const array = [];
+                  let error = "";
+                  for (const file of e.target.files) {
+                    if (file.size > 5000000) {
+                      error += `Le fichier ${file.name} est trop volumineux.`;
+                    } else {
+                      array.push(file);
                     }
-                    setError(error);
-                    console.log(array);
-                    setFilesToUpload([...filesToUpload, ...array]);
-                  } else {
-                    setFilesToUpload(e.target.files);
                   }
-                }}
-                className="hidden"
-              />
-              <div className="flex items-center justify-between mt-4">
-                <label htmlFor="file-upload" className="flex text-xs space-x-4 items-center">
-                  <AddButton className="" />
-                  <div className="cursor-pointer text-gray-500 hover:text-gray-800">Ajouter un document</div>
-                </label>
-              </div>
-              {filesToUpload && (
-                <>
-                  <div className="w-full flex space-x-2 justify-between mt-2 items-center">
-                    {!blockUpload ? (
-                      <>
-                        <div className="3/4">
-                          {Array.from(filesToUpload).map((file) => (
-                            <div key={file.name} className="text-[12px]">
-                              {file.name}
-                            </div>
-                          ))}
-                        </div>
-                        <div className="1/4">
-                          <PlainButton onClick={() => upload(filesToUpload)} disabled={!category || !date}>
-                            Téléverser
-                          </PlainButton>
-                        </div>
-                      </>
-                    ) : (
-                      <div className="flex flex-column w-100">
+                  setError(error);
+                  console.log(array);
+                  setFilesToUpload([...filesToUpload, ...array]);
+                } else {
+                  setFilesToUpload(e.target.files);
+                }
+              }}
+              className="hidden"
+            />
+            <div className="flex items-center justify-between mt-4">
+              <label htmlFor="file-upload" className="flex text-xs space-x-4 items-center">
+                <AddButton className="" />
+                <div className="cursor-pointer text-gray-500 hover:text-gray-800">Ajouter un document</div>
+              </label>
+            </div>
+            {filesToUpload && (
+              <>
+                <div className="w-full flex space-x-2 justify-between mt-2 items-center">
+                  {!blockUpload ? (
+                    <>
+                      <div className="3/4">
                         {Array.from(filesToUpload).map((file) => (
-                          <div key={file.name} className="text-[12px] flex flex-row justify-between">
-                            <div>{file.name}</div>
-                            <div className="cursor-pointer" onClick={() => removeFileInscription(file)}>
-                              X
-                            </div>
+                          <div key={file.name} className="text-[12px]">
+                            {file.name}
                           </div>
                         ))}
                       </div>
-                    )}
-                  </div>
-                  <div className="flex mt-4 w-full space-x-2">
-                    <div className="relative bg-white py-[9px] px-[13px] border-[#D1D5DB] border-[1px] rounded-[6px] w-1/2">
-                      <label className="font-normal text-[12px] leading-[16px] text-[#6B7280]">Date d&apos;expiration</label>
-                      <DatePickerList fromEdition={false} value={new Date(date)} onChange={(val) => setDate(val)} />
+                      <div className="1/4">
+                        <PlainButton onClick={() => upload(filesToUpload)} disabled={!category || !date}>
+                          Téléverser
+                        </PlainButton>
+                      </div>
+                    </>
+                  ) : (
+                    <div className="flex flex-column w-100">
+                      {Array.from(filesToUpload).map((file) => (
+                        <div key={file.name} className="text-[12px] flex flex-row justify-between">
+                          <div>{file.name}</div>
+                          <div className="cursor-pointer" onClick={() => removeFileInscription(file)}>
+                            X
+                          </div>
+                        </div>
+                      ))}
                     </div>
-                    <Field
-                      label="Catégorie"
-                      value={category}
-                      transformer={translate}
-                      mode="edition"
-                      type="select"
-                      className="w-1/2"
-                      options={["cniNew", "cniOld", "passport"].map((e) => ({ value: e, label: translate(e) }))}
-                      onChange={(val) => setCategory(val)}
-                    />
+                  )}
+                </div>
+                <div className="flex mt-4 w-full space-x-2">
+                  <div className="relative bg-white py-[9px] px-[13px] border-[#D1D5DB] border-[1px] rounded-[6px] w-1/2">
+                    <label className="font-normal text-[12px] leading-[16px] text-[#6B7280]">Date d&apos;expiration</label>
+                    <DatePickerList fromEdition={false} value={new Date(date)} onChange={(val) => setDate(val)} />
                   </div>
-                </>
-              )}
-            </>
-          )}
+                  <Field
+                    label="Catégorie"
+                    value={category}
+                    transformer={translate}
+                    mode="edition"
+                    type="select"
+                    className="w-1/2"
+                    options={["cniNew", "cniOld", "passport"].map((e) => ({ value: e, label: translate(e) }))}
+                    onChange={(val) => setCategory(val)}
+                  />
+                </div>
+              </>
+            )}
+          </>
         </div>
         <div className="flex p-[24px] items-center justify-center">
           <BorderButton onClick={() => onClose(changes)}>Fermer</BorderButton>
