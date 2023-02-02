@@ -131,7 +131,7 @@ export default function TeamModal({ isOpen, onCancel, team, setTeam }) {
       ) : (
         <div className="space-y-8">
           <p className="text-lg font-medium text-center">L&apos;équipe</p>
-          <div className="h-88 grid grid-cols-2 gap-6 overflow-auto">
+          <div className="max-h-80 grid grid-cols-2 gap-6 auto-cols-min overflow-auto">
             {team?.length && team.map((responsible) => <DisplayContact key={responsible._id} responsible={responsible} setResponsible={setResponsible} />)}
             <AddContact setResponsible={setResponsible} />
           </div>
@@ -166,7 +166,7 @@ export default function TeamModal({ isOpen, onCancel, team, setTeam }) {
 const DisplayContact = ({ responsible, setResponsible }) => {
   const [copied, setCopied] = useState(false);
   return (
-    <div className="group flex flex-col rounded-lg border-grey-200 border-[1px] h-28">
+    <a href={"/user/" + responsible._id} className="group flex flex-col rounded-xl border-grey-200 border-[1px] h-28">
       <div className="flex justify-between items-center">
         <div className="flex items-center p-3">
           <div className="h-9 w-9 flex justify-center items-center rounded-full bg-gray-100 text-blue-600 text-sm font-bold mr-3">
@@ -206,14 +206,14 @@ const DisplayContact = ({ responsible, setResponsible }) => {
           </div>
         )}
       </div>
-    </div>
+    </a>
   );
 };
 
 const AddContact = ({ setResponsible }) => {
   return (
     <div
-      className="flex flex-row border-dashed border-blue-600 rounded-lg bg-[#ffffff] border-grey-200 border-[1px] px-2 items-center justify-center hover:cursor-pointer h-28 hover:bg-[#eff6ff]"
+      className="flex flex-row border-dashed border-blue-600 rounded-xl bg-[#ffffff] border-grey-200 border-[1px] px-2 items-center justify-center hover:cursor-pointer h-28 hover:bg-[#eff6ff]"
       onClick={() => setResponsible({})}>
       <HiPlus className="text-indigo-300" />
       <div className="pl-2 text-blue-600 text-sm">Ajouter un responsable</div>
