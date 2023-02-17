@@ -48,6 +48,7 @@ import DeleteFilters from "../../components/buttons/DeleteFilters";
 import Breadcrumbs from "../../components/Breadcrumbs";
 import { translateApplicationFileType, youngExportFields } from "snu-lib";
 import ModalExport from "../../components/modals/ModalExport";
+import Select from "../centersV2/components/Select";
 
 const FILTERS = [
   "SEARCH",
@@ -94,6 +95,86 @@ const FILTERS = [
 ];
 
 export default function VolontaireList() {
+  const [data, setData] = useState([]);
+  // Filters
+  // const filters = [
+  //   { label: "status", value: { term: { status: statusFilter } } },
+  //   { label: "cohort", value: { term: { cohort: cohortFilter } } },
+  // ];
+
+  const [statusFilter, setStatusFilter] = useState({ field: "status.keyword", value: [] });
+  const status = ["IN_PROGRESS", "VALIDATED", "WAITING_VALIDATION", "WAITING_CORRECTION", "REFUSED", "WITHDRAWN"];
+  const statusOptions = status.map((e) => ({ label: translate(e), value: e }));
+  const [cohortFilter, setCohortFilter] = useState({});
+  const filters = [statusFilter, cohortFilter];
+  console.log("🚀 ~ file: list.js:108 ~ VolontaireList ~ filters", filters);
+  // Query
+  // const body = [
+  //   { index: "young", type: "_doc" },
+  //   {
+  //     query,
+  //     aggs: {
+  //       status: { terms: { field: "statusCode.keyword" } },
+  //       domain: { terms: { field: "domain.keyword" } },
+  //       organization: { terms: { field: "organizationName.keyword" } },
+  //       activity: { terms: { field: "activity.keyword" } },
+  //       city: { terms: { field: "city.keyword" } },
+  //     },
+  //     size: size,
+  //     from: size * (page - 1),
+  //     sort: [{ createdAt: { order: "desc" } }],
+  //   },
+  // ];
+
+  const basequery = {
+    query: {
+      bool: {
+        must: {
+          match_all: {},
+          terms: [],
+        },
+      },
+    },
+    track_total_hits: true,
+  };
+  const queryWithFilters = addFiltersToQuery(basequery, filters);
+
+  function addFiltersToQuery(basequery, filters) {
+    let query = basequery;
+    for (const f of filters) {
+      if (f.value?.length) query.query.bool.must.terms.push({ [f.field]: f.value });
+    }
+    console.log("🚀 ~ file: list.js:140 ~ addFiltersToQuery ~ query", query);
+    return query;
+  }
+
+  // Results
+  async function getResultsFromAggs(query) {
+    const { responses } = await api.esQuery("young", query);
+    if (!responses) return [];
+    const data = responses[0]?.hits?.hits.map((e) => ({ _id: e._id, ...e._source }));
+    return data;
+  }
+
+  useEffect(() => {
+    async function fetchData() {
+      const data = await getResultsFromAggs(queryWithFilters);
+      console.log("🚀 ~ file: list.js:158 ~ VolontaireList ~ data", data);
+      setData(data);
+    }
+    fetchData();
+  }, []);
+
+  return (
+    <div className="bg-white rounded-xl shadow-sm m-8 p-8">
+      <p>Filters</p>
+      <Select options={statusOptions} label="Statut" selected={statusFilter.value} setSelected={(f) => setStatusFilter({ ...statusFilter, value: f })} />
+      <div>{data.length}</div>
+    </div>
+  );
+}
+
+function VolontaireListOld() {
   const user = useSelector((state) => state.Auth.user);
 
   const [volontaire, setVolontaire] = useState(null);
