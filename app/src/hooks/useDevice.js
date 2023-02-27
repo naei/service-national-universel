@@ -1,4 +1,4 @@
-import tailwind from "../../tailwind.config";
+import tailwind from "../../tailwind.config.cjs";
 
 export default function useDevice(breakpoint = "md") {
   if (window.innerWidth <= parseInt(tailwind.theme.screens[breakpoint])) return "mobile";
