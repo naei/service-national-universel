@@ -182,11 +182,11 @@ export default function VolontaireList() {
         schoolSituation: {
           Situation: translate(data.situation),
           Niveau: translate(data.grade),
-          "Type d'établissement": translate(data.esSchool?.type || data.schoolType),
-          "Nom de l'établissement": data.esSchool?.fullName || data.schoolName,
-          "Code postal de l'établissement": data.esSchool?.postcode || data.schoolZip,
-          "Ville de l'établissement": data.esSchool?.city || data.schoolCity,
-          "Département de l'établissement": departmentLookUp[data.esSchool?.department] || data.schoolDepartment,
+          "Type d'établissement": data.schoolType || translate(data.esSchool?.type),
+          "Nom de l'établissement": data.schoolName || data.esSchool?.fullName,
+          "Code postal de l'établissement": data.schoolZip || data.esSchool?.postcode,
+          "Ville de l'établissement": data.schoolCity || data.esSchool?.city,
+          "Département de l'établissement": data.schoolDepartment || departmentLookUp[data.esSchool?.department],
           "UAI de l'établissement": data.esSchool?.uai,
         },
         situation: {
