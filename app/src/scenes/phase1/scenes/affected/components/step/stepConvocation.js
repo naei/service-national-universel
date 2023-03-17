@@ -3,7 +3,7 @@ import { AiOutlineEye, AiOutlineEyeInvisible } from "react-icons/ai";
 import { BsCheck2 } from "react-icons/bs";
 import { HiOutlineDownload, HiOutlineMail } from "react-icons/hi";
 import { toastr } from "react-redux-toastr";
-import { Modal } from "reactstrap";
+import { Modal, Spinner } from "reactstrap";
 import CloseSvg from "../../../../../../assets/Close";
 import DownloadConvocationButton from "../../../../../../components/buttons/DownloadConvocationButton";
 import { ModalContainer } from "../../../../../../components/modals/Modal";
@@ -13,20 +13,27 @@ import api from "../../../../../../services/api";
 import Convocation from "../Convocation";
 import { capture } from "../../../../../../sentry";
 import { translate } from "snu-lib";
+import { useDispatch } from "react-redux";
+import plausibleEvent from "../../../../../../services/plausible";
+import { setYoung } from "../../../../../../redux/auth/actions";
+import downloadPDF from "../../../../../../utils/download-pdf";
+import ButtonPrimaryOutline from "../../../../../../components/ui/buttons/ButtonPrimaryOutline";
 
 export default function StepConvocation({ young }) {
   const [showConvocation, setShowConvocation] = useState(false);
   const [stateMobil, setStateMobil] = useState(false);
-  const [valid, setValid] = useState(false);
-  const [enabled, setEnabled] = useState(false);
+  const valid = young?.convocationFileDownload === "true";
+  const enabled = young?.youngPhase1Agreement === "true";
   const [modal, setModal] = useState({ isOpen: false, onConfirm: null });
+  const [loading, setLoading] = useState();
+  const dispatch = useDispatch();
 
-  useEffect(() => {
-    if (young) {
-      setEnabled(young.youngPhase1Agreement === "true");
-      setValid(young.convocationFileDownload === "true");
-    }
-  }, [young]);
+  const handleDownload = async () => {
+    if (young?.convocationFileDownload === "true") return;
+    const { data } = await api.put(`/young/phase1/convocation`, { convocationFileDownload: "true" });
+    plausibleEvent("affecté_step3");
+    dispatch(setYoung(data));
+  };
 
   const handleMail = async () => {
     try {
@@ -39,12 +46,24 @@ export default function StepConvocation({ young }) {
       toastr.success(`Document envoyé à ${young.email}`);
       setStateMobil(false);
       setModal({ isOpen: false, onConfirm: null });
+      handleDownload();
     } catch (e) {
       capture(e);
       toastr.error("Erreur lors de l'envoie du document : ", e.message);
       setStateMobil(false);
       setModal({ isOpen: false, onConfirm: null });
     }
+  };
+
+  const viewFile = async () => {
+    setLoading(true);
+    await downloadPDF({
+      url: `/young/${young._id}/documents/convocation/cohesion`,
+      fileName: `${young.firstName} ${young.lastName} - convocation - cohesion.pdf`,
+      errorTitle: "Une erreur est survenue lors de l'édition de votre convocation",
+    });
+    handleDownload();
+    setLoading(false);
   };
 
   return (
@@ -95,15 +114,10 @@ export default function StepConvocation({ young }) {
                 </WithTooltip>
               </button>
 
-              <DownloadConvocationButton
-                young={young}
-                uri="cohesion"
-                className={`flex flex-row  items-center justify-center px-4 py-2 rounded-lg ${
-                  valid ? "border-[1px] border-blue-700 " : "bg-blue-600"
-                } cursor-pointer hover:scale-105 ${valid ? "text-blue-700" : "text-white"}`}>
-                <HiOutlineDownload className={`h-5 w-5 ${valid ? "text-blue-700" : "text-blue-300"} mr-2`} />
-                Télécharger
-              </DownloadConvocationButton>
+              <ButtonPrimaryOutline onClick={viewFile}>
+                <HiOutlineDownload />
+                {loading ? <Spinner size="sm" style={{ borderWidth: "0.1em" }} /> : "Télécharger"}
+              </ButtonPrimaryOutline>
             </div>
           </>
         ) : null}
@@ -149,6 +163,8 @@ export default function StepConvocation({ young }) {
             <div className="w-full p-4">
               <div className="flex flex-col items-center justify-center">
                 <h1 className="text-gray-900 text-xl text-center pb-3">Choisissez une option de téléchargement</h1>
+                <ButtonPrimaryOutline onClick={viewFile}>Télécharger</ButtonPrimaryOutline>
+
                 <DownloadConvocationButton
                   young={young}
                   uri="cohesion"

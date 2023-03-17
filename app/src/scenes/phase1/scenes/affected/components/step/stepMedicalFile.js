@@ -13,6 +13,10 @@ import { SENDINBLUE_TEMPLATES } from "../../../../../../utils";
 import { toastr } from "react-redux-toastr";
 import plausibleEvent from "../../../../../../services/plausible";
 import { CDN_BASE_URL } from "../../../../../representants-legaux/commons";
+import ExternalLinkOutline from "../../../../../../components/ui/buttons/ButtonLinkOutline";
+import ExternalLinkPrimary from "../../../../../../components/ui/links/ExternalLinkPrimary";
+import ButtonExternalLinkPrimary from "../../../../../../components/ui/buttons/ButtonExternalLinkPrimary";
+import ButtonPrimaryOutline from "../../../../../../components/ui/buttons/ButtonPrimaryOutline";
 
 export default function StepMedicalField({ young }) {
   const [stateMobil, setStateMobil] = useState(false);
@@ -36,7 +40,6 @@ export default function StepMedicalField({ young }) {
   };
 
   const handleMail = async () => {
-    console.log(SENDINBLUE_TEMPLATES);
     const { ok } = await api.post(`/young/${young._id}/email/${SENDINBLUE_TEMPLATES.young.LINK}`, {
       object: `Fiche sanitaire à compléter`,
       message: "Vous trouverez téléchargeable ci-dessous la fiche sanitaire à compléter.",
@@ -46,6 +49,7 @@ export default function StepMedicalField({ young }) {
     else toastr.error("Erreur lors de l'envoie du document");
     setStateMobil(false);
     setModal({ isOpen: false, onConfirm: null });
+    handleDownload();
   };
 
   return (
@@ -69,34 +73,26 @@ export default function StepMedicalField({ young }) {
         </div>
         {/* Button */}
         {enabled ? (
-          <>
-            <div className="flex flex-row items-center justify-center pb-4 lg:!pb-0">
-              <button
-                className="flex items-center justify-center bg-gray-100 h-8 w-8 rounded-full mr-4 cursor-pointer hover:scale-110"
-                onClick={() =>
-                  setModal({
-                    isOpen: true,
-                    onConfirm: handleMail,
-                    title: "Envoie de document par mail",
-                    message: `Vous allez recevoir le lien de téléchargement de la fiche sanitaire par mail à l'adresse ${young.email}.`,
-                  })
-                }>
-                <WithTooltip tooltipText="Recevoir par email">
-                  <HiOutlineMail className="h-5 w-5 text-gray-600" />
-                </WithTooltip>
-              </button>
-              <a target="blank" href={CDN_BASE_URL + "/file/fiche-sanitaire-2023.pdf"} onClick={handleDownload}>
-                <button
-                  type="button"
-                  className={`flex flex-row items-center justify-center px-4 py-2 rounded-lg ${
-                    valid ? "border-[1px] border-blue-700 " : "bg-blue-600"
-                  } cursor-pointer hover:scale-105`}>
-                  <HiOutlineDownload className={`h-5 w-5 ${valid ? "text-blue-700" : "text-blue-300"} mr-2`} />
-                  <span className={`${valid ? "text-blue-700" : "text-white"}`}>Télécharger</span>
-                </button>
-              </a>
-            </div>
-          </>
+          <div className="flex flex-row items-center justify-center pb-4 lg:!pb-0">
+            <button
+              className="flex items-center justify-center bg-gray-100 h-8 w-8 rounded-full mr-4 cursor-pointer hover:scale-110"
+              onClick={() =>
+                setModal({
+                  isOpen: true,
+                  onConfirm: handleMail,
+                  title: "Envoie de document par mail",
+                  message: `Vous allez recevoir le lien de téléchargement de la fiche sanitaire par mail à l'adresse ${young.email}.`,
+                })
+              }>
+              <WithTooltip tooltipText="Recevoir par email">
+                <HiOutlineMail className="h-5 w-5 text-gray-600" />
+              </WithTooltip>
+            </button>
+            <ExternalLinkOutline href={CDN_BASE_URL + "/file/fiche-sanitaire-2023.pdf"} onClick={handleDownload}>
+              <HiOutlineDownload className={`h-5 w-5 ${valid ? "text-blue-700" : "text-blue-300"} mr-2`} />
+              Télécharger
+            </ExternalLinkOutline>
+          </div>
         ) : null}
       </div>
       {/* Mobile */}
@@ -124,32 +120,27 @@ export default function StepMedicalField({ young }) {
         <Modal centered isOpen={stateMobil} toggle={() => setStateMobil(false)} size="xl">
           <ModalContainer>
             <CloseSvg className="close-icon hover:cursor-pointer" height={10} width={10} onClick={() => setStateMobil(false)} />
-            <div className="w-full p-4">
-              <div className="flex flex-col items-center justify-center">
-                <h1 className="text-gray-900 text-xl text-center pb-3">Choisissez une option de téléchargement</h1>
-                <button type="button" className="flex flex-row w-full items-center justify-center px-4 py-2 mb-2 rounded-lg bg-blue-600 cursor-pointer hover:scale-105">
-                  <HiOutlineDownload className="h-5 w-5 text-blue-300 mr-2" />
-                  <a target="blank" href={CDN_BASE_URL + "/file/fiche-sanitaire-2023.pdf"} onClick={handleDownload}>
-                    <span className="text-white text-sm">Télécharger</span>
-                  </a>
-                </button>
-                <button
-                  onClick={() =>
-                    setModal({
-                      isOpen: true,
-                      onConfirm: handleMail,
-                      title: "Envoie de document par mail",
-                      message: `Vous allez recevoir le lien de téléchargement de la fiche sanitaire par mail à l'adresse ${young.email}.`,
-                    })
-                  }
-                  type="button"
-                  className="flex flex-1 flex-row w-full items-center justify-center px-4 py-2 rounded-lg border-[1px] border-blue-700 cursor-pointer hover:scale-105">
-                  <HiOutlineMail className="h-5 w-5 text-blue-700 mr-2" />
-                  <span young={young} uri="cohesion" className="text-blue-700 text-sm">
-                    Recevoir par mail
-                  </span>
-                </button>
-              </div>
+            <div className="w-full p-4 flex flex-col items-center justify-center gap-2">
+              <h1 className="text-gray-900 text-xl text-center pb-3">Choisissez une option de téléchargement</h1>
+
+              <ButtonExternalLinkPrimary href={CDN_BASE_URL + "/file/fiche-sanitaire-2023.pdf"} onClick={handleDownload} className="w-full">
+                <HiOutlineDownload className="h-5 w-5 text-blue-300 mr-2" />
+                Télécharger
+              </ButtonExternalLinkPrimary>
+
+              <ButtonPrimaryOutline
+                onClick={() =>
+                  setModal({
+                    isOpen: true,
+                    onConfirm: handleMail,
+                    title: "Envoie de document par mail",
+                    message: `Vous allez recevoir le lien de téléchargement de la fiche sanitaire par mail à l'adresse ${young.email}.`,
+                  })
+                }
+                className="w-full">
+                <HiOutlineMail className="h-5 w-5 text-blue-700 mr-2" />
+                Recevoir par mail
+              </ButtonPrimaryOutline>
             </div>
           </ModalContainer>
         </Modal>
