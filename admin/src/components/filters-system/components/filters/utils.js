@@ -129,14 +129,7 @@ export const buildBody = (selectedFilters, page, size, defaultQuery, filterArray
   // query sur la searchBar
   if (selectedFilters?.searchbar?.filter[0] && selectedFilters?.searchbar?.filter[0]?.trim() !== "") {
     bodyQuery.query.bool.must.push({
-      bool: {
-        should: [
-          { multi_match: { query: selectedFilters?.searchbar?.filter[0], fields: searchBarObject.datafield, type: "cross_fields", operator: "and" } },
-          { multi_match: { query: selectedFilters?.searchbar?.filter[0], fields: searchBarObject.datafield, type: "phrase", operator: "and" } },
-          { multi_match: { query: selectedFilters?.searchbar?.filter[0], fields: searchBarObject.datafield, type: "phrase_prefix", operator: "and" } },
-        ],
-        minimum_should_match: 1,
-      },
+      multi_match: { query: selectedFilters?.searchbar?.filter[0], fields: searchBarObject.datafield, type: "best_fields", operator: "or", fuzziness: 2 },
     });
   }
 
