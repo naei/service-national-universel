@@ -24,9 +24,7 @@ router.post("/eligibility/2023/:id?", async (req, res) => {
       if (value) young = await YoungModel.findById(value);
       else {
         const { error: bodyError, value: body } = Joi.object({
-          schoolDepartment: Joi.string(),
           department: Joi.string(),
-          schoolRegion: Joi.string(),
           region: Joi.string(),
           birthdateAt: Joi.date().required(),
           grade: Joi.string(),

@@ -30,9 +30,8 @@ const {
   PUBLIC_BUCKET_NAME_SUPPORT,
   translateFileStatusPhase1,
   SUB_ROLES,
-  getAge,
 } = require("../config");
-const { YOUNG_STATUS_PHASE2, SENDINBLUE_TEMPLATES, YOUNG_STATUS, APPLICATION_STATUS, FILE_STATUS_PHASE1, ROLES } = require("snu-lib");
+const { YOUNG_STATUS_PHASE1, YOUNG_STATUS_PHASE2, SENDINBLUE_TEMPLATES, YOUNG_STATUS, APPLICATION_STATUS, FILE_STATUS_PHASE1, ROLES } = require("snu-lib");
 const { capture } = require("../sentry");
 const { getCohortValidationDate } = require("./cohort");
 
@@ -838,6 +837,7 @@ module.exports = {
   checkStatusContract,
   sanitizeAll,
   YOUNG_STATUS,
+  YOUNG_STATUS_PHASE1,
   YOUNG_SITUATIONS,
   STEPS,
   STEPS2023,
